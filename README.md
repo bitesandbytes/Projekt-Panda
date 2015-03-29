@@ -1,4 +1,4 @@
-# Projekt-Panda
+# Project-Panda
 This project aims to develop a platform-independent and Java-based chat application.
 The project ideas are divided into two categories - Basic and Advanced.
 
