@@ -1,5 +1,6 @@
 # Projekt-Panda
 This project aims to develop a platform-independent and Java-based chat application.
+Project Collaborators : J S Suhas (bitesandbytes) and Akshay Balaji (akshay-balaji)
 The project ideas are divided into two categories - Basic and Advanced.
 
 ##Basic Features
