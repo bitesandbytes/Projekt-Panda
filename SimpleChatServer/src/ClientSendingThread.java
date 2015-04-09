@@ -57,6 +57,7 @@ public class ClientSendingThread extends Thread
 			try
 			{
 				outStream.writeObject(curMessage);
+				outStream.flush();
 			}
 			catch (IOException e)
 			{
