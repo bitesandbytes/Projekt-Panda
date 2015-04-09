@@ -1,14 +1,15 @@
 public class Client
 {
-	public static ClientSendingThread sendMessagesThread;
-	public static ClientReceivingThread rcvMessagesThread;
+	private static ClientSendingThread sendMessagesThread;
+	private static ClientReceivingThread rcvMessagesThread;
 	public static Boolean connected = true;
 
 	public static void main(String[] args) throws InterruptedException
 	{
 		sendMessagesThread = new ClientSendingThread();
+		rcvMessagesThread = new ClientReceivingThread();
 		rcvMessagesThread.start();
-		Thread.sleep(50);
+		Thread.sleep(5000);
 		sendMessagesThread.start();
 		endSending();
 	}

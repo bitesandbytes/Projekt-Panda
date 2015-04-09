@@ -21,8 +21,7 @@ public class ClientReceivingThread extends Thread
 		}
 		catch (IOException e)
 		{
-			stopRunning();
-			e.printStackTrace();
+			System.exit(0);
 		}
 	}
 
