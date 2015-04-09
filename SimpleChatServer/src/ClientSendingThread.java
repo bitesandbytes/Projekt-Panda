@@ -11,16 +11,19 @@ public class ClientSendingThread extends Thread
 	private Scanner consoleInput;
 	private Socket clientSocket;
 	private ObjectOutputStream outStream;
+	public boolean isRunning;
 	
 	ClientSendingThread()
 	{
 		super();
 		curMessage = null;
 		consoleInput = new Scanner(System.in);
+		isRunning = false;
 	}
 	
 	public void run()
 	{
+		isRunning = true;
 		try
 		{
 			clientSocket = new Socket(destIP, destPort);
@@ -44,7 +47,7 @@ public class ClientSendingThread extends Thread
 		while(curMessage!=null)
 		{
 			curMessage = consoleInput.nextLine();
-			if(curMessage.compareTo("exit"))
+			if(curMessage.compareTo("exit") == 0)
 			{
 				curMessage = null;
 				continue;
@@ -56,9 +59,27 @@ public class ClientSendingThread extends Thread
 			catch (IOException e)
 			{
 				System.out.println("Lost connection to the remote client. Terminating application.");
-				System.exit(0);
-				e.printStackTrace();
+				isRunning = false;
+				try
+				{
+					clientSocket.close();
+				}
+				catch (IOException e1)
+				{
+					e1.printStackTrace();
+				}
+				return;
 			}
+		}
+		try
+		{
+			clientSocket.close();
+		}
+		catch (IOException e)
+		{
+			System.out.println("Unable to close socket. Terminating application.");
+			isRunning = false;
+			return;
 		}
 	}
 }
