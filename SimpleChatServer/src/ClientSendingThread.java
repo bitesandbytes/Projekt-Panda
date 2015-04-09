@@ -11,19 +11,16 @@ public class ClientSendingThread extends Thread
 	private Scanner consoleInput;
 	private Socket clientSocket;
 	private ObjectOutputStream outStream;
-	public boolean isRunning;
 	
 	ClientSendingThread()
 	{
 		super();
 		curMessage = null;
 		consoleInput = new Scanner(System.in);
-		isRunning = false;
 	}
 	
 	public void run()
 	{
-		isRunning = true;
 		try
 		{
 			clientSocket = new Socket(destIP, destPort);
@@ -31,7 +28,8 @@ public class ClientSendingThread extends Thread
 		catch (IOException e)
 		{
 			System.out.println("Unable to connect to destination. Terminating application.");
-			e.printStackTrace();
+			stopRunning();
+			return;
 		}
 		try
 		{
@@ -40,9 +38,13 @@ public class ClientSendingThread extends Thread
 		catch (IOException e)
 		{
 			System.out.println("Unable to get OOS.");
-			e.printStackTrace();
+			stopRunning();
+			return;
 		}
-		
+		synchronized(Client.connected)
+		{
+			Client.connected = true;
+		}
 		curMessage = "";
 		while(curMessage!=null)
 		{
@@ -59,14 +61,15 @@ public class ClientSendingThread extends Thread
 			catch (IOException e)
 			{
 				System.out.println("Lost connection to the remote client. Terminating application.");
-				isRunning = false;
+				stopRunning();
 				try
 				{
 					clientSocket.close();
 				}
 				catch (IOException e1)
 				{
-					e1.printStackTrace();
+					stopRunning();
+					return;
 				}
 				return;
 			}
@@ -78,8 +81,19 @@ public class ClientSendingThread extends Thread
 		catch (IOException e)
 		{
 			System.out.println("Unable to close socket. Terminating application.");
-			isRunning = false;
+			stopRunning();
 			return;
+		}
+		stopRunning();
+		return;
+	}
+	
+	public void stopRunning()
+	{
+		synchronized(Client.connected)
+		{
+			Client.connected = false;
+			Client.connected.notify();
 		}
 	}
 }
