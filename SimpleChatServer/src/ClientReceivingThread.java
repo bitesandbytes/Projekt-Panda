@@ -2,29 +2,30 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Scanner;
 
 public class ClientReceivingThread extends Thread
 {
-	private String curMessage;
-	private final int destPort = 2500;
+	private String rcvMessage;
+	private final int listenPort = 2500;
 	private ServerSocket serverSocket;
 	private Socket clientSocket;
 	private ObjectInputStream inStream;
-	
+
 	ClientReceivingThread()
 	{
 		super();
-		curMessage = null;
-		new Scanner(System.in);
-		try {
-			serverSocket = new ServerSocket(destPort);
-		} catch (IOException e) {
+		rcvMessage = null;
+		try
+		{
+			serverSocket = new ServerSocket(listenPort);
+		}
+		catch (IOException e)
+		{
 			stopRunning();
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void run()
 	{
 		try
@@ -33,7 +34,8 @@ public class ClientReceivingThread extends Thread
 		}
 		catch (IOException e)
 		{
-			System.out.println("Unable to connect to destination. Terminating application.");
+			System.out
+					.println("Unable to bind to listener. Terminating application.");
 			stopRunning();
 			return;
 		}
@@ -47,22 +49,22 @@ public class ClientReceivingThread extends Thread
 			stopRunning();
 			return;
 		}
-		synchronized(Client.connected)
+		synchronized (Client.connected)
 		{
 			Client.connected = true;
 		}
-		curMessage = "";
-		while(true)
+		while (true)
 		{
-			
+
 			try
 			{
-				curMessage = (String) inStream.readObject();
-				System.out.println("sauce :"+curMessage);
+				rcvMessage = (String) inStream.readObject();
+				System.out.println("bolji :" + rcvMessage);
 			}
 			catch (IOException | ClassNotFoundException e)
 			{
-				System.out.println("Unable to read String from Client. Terminating application.");
+				System.out
+						.println("Unable to read String from Client. Terminating application.");
 				stopRunning();
 				try
 				{
@@ -78,13 +80,14 @@ public class ClientReceivingThread extends Thread
 		}
 		return;
 	}
-	
+
 	public void stopRunning()
 	{
-		synchronized(Client.connected)
+		synchronized (Client.connected)
 		{
 			Client.connected = false;
 			Client.connected.notify();
 		}
+		return;
 	}
 }
