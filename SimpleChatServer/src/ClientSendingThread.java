@@ -6,7 +6,7 @@ import java.util.Scanner;
 public class ClientSendingThread extends Thread
 {
 	private String curMessage;
-	private final String destIP = "192.168.1.221";
+	private final String destIP = "192.168.1.208";
 	private final int destPort = 2500;
 	private Scanner consoleInput;
 	private Socket clientSocket;
