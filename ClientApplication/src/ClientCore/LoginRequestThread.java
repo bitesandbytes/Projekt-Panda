@@ -1,13 +1,19 @@
+package ClientCore;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.net.UnknownHostException;
+
+import Object.User;
+
 
 public class LoginRequestThread extends Thread {
 	private Socket clientSocket;
-	private final String destIP = "192.168.1.221";
-	private final int destPort = 2400;
+	private final static String destIP = "10.42.0.27";
+	private final static int destPort = 2400;
+	private final static String hostIP = "10.42.0.27";
+	private final static int hostPort = 2500;
 	User user;
 	private ObjectOutputStream outStream;
 	private ObjectInputStream inStream;
@@ -21,16 +27,14 @@ public class LoginRequestThread extends Thread {
 	public void run() {
 			System.out.println("Sending a socket connection");
 			try {
-				clientSocket = new Socket(destIP, destPort);
-			} catch (UnknownHostException e) {
-				// notLoggedIn();
-				System.out.println("UnknownHostException");
-				e.printStackTrace();
+				clientSocket.bind(new InetSocketAddress(hostIP, hostPort));
+			} catch (IOException e1) {
+				System.out.println("Unable to bind the socket.");
+			}
+			try {
+				clientSocket.connect(new InetSocketAddress(destIP, destPort));
 			} catch (IOException e) {
-				// notLoggedIn();
-				System.out
-						.println("IO EXCEPTION: Possibly unitialized nick and password");
-				e.printStackTrace();
+				System.out.println("Unable to establish connection with server");
 			}
 			System.out.println("Intializing output Stream");
 			try {
@@ -74,10 +78,10 @@ public class LoginRequestThread extends Thread {
 			}
 			if (serverInput.booleanValue() == true && Client.user.isNewUser == true) {
 				System.out.println("Sign Up Successful");
-				(new PostLoginRequestThread()).start();
+				(new ChatInstantiateThread()).start();
 			}
 			else if(serverInput.booleanValue() == true && Client.user.isNewUser == false)
-				(new PostLoginRequestThread()).start();
+				(new ChatInstantiateThread()).start();
 			else if(serverInput.booleanValue() == false && Client.user.isNewUser == true)
 				System.out.println("Sign Up Unsuccessful. Nick Already Taken");
 			else
