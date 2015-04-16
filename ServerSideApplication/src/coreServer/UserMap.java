@@ -18,7 +18,10 @@ public class UserMap
 
 	public boolean isNickUsed(String checkNick)
 	{
-		return userMap.containsKey(checkNick);
+		synchronized (userMap)
+		{
+			return userMap.containsKey(checkNick);
+		}
 	}
 
 	public boolean addNewUser(String nick, String pass, InetAddress ip)
@@ -41,37 +44,46 @@ public class UserMap
 
 	public boolean logIn(String nick, String pass, InetAddress ip)
 	{
-		if (!userMap.containsKey(nick))
-			return false;
-		else
+		synchronized (userMap)
 		{
-			User newUser = new User(nick, pass);
-			if (newUser.compareTo(userMap.get(nick)) != 0)
+			if (!userMap.containsKey(nick))
 				return false;
-
 			else
 			{
-				synchronized (onlineUsers)
+				User newUser = new User(nick, pass);
+				if (newUser.compareTo(userMap.get(nick)) != 0)
+					return false;
+
+				else
 				{
-					onlineUsers.put(nick, ip.getHostAddress());
+					synchronized (onlineUsers)
+					{
+						onlineUsers.put(nick, ip.getHostAddress());
+					}
+					return true;
 				}
-				return true;
 			}
 		}
 	}
 
 	public boolean logOut(String nick)
 	{
-		if (onlineUsers.containsKey(nick))
+		synchronized (onlineUsers)
 		{
-			onlineUsers.put(nick, null);
-			return true;
+			if (onlineUsers.containsKey(nick))
+			{
+				onlineUsers.put(nick, null);
+				return true;
+			}
 		}
 		return false;
 	}
-	
+
 	public String getCurrentIP(String nick)
 	{
-		return onlineUsers.get(nick);
+		synchronized (onlineUsers)
+		{
+			return onlineUsers.get(nick);
+		}
 	}
 }

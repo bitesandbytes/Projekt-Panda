@@ -18,7 +18,7 @@ public class MessageSenderThread extends Thread
 	private final int msgPort = 2500;
 	private String destIP;
 	private Request currentRequest;
-	
+
 	public MessageSenderThread(RequestQueue queue, UserMap map)
 	{
 		this.queue = queue;
@@ -30,9 +30,9 @@ public class MessageSenderThread extends Thread
 		while (true)
 		{
 			currentRequest = null;
-			while (currentRequest == null)
+			synchronized (queue)
 			{
-				synchronized (queue)
+				while (queue.isEmpty())
 				{
 					try
 					{
@@ -44,6 +44,7 @@ public class MessageSenderThread extends Thread
 					}
 				}
 			}
+
 			currentRequest = queue.removeRequest();
 
 			if (currentRequest == null)
@@ -65,8 +66,12 @@ public class MessageSenderThread extends Thread
 					.println("Dropped a message packet. Retry failed 3 times.");
 			return;
 		}
+		
+		synchronized (userMap)
+		{
+			destIP = userMap.getCurrentIP(currentRequest.msgContent.destNick);
+		}
 
-		destIP = userMap.getCurrentIP(currentRequest.msgContent.destNick);
 		currentRequest.retryCount--;
 		if (destIP == null)
 		{
@@ -81,7 +86,9 @@ public class MessageSenderThread extends Thread
 			}
 			catch (IOException e)
 			{
-				// Should never happen.
+				System.out.println("Unable to get client socket.");
+				queue.addRequest(currentRequest);
+				return;
 			}
 		}
 		try
@@ -124,11 +131,12 @@ public class MessageSenderThread extends Thread
 		}
 
 		destIP = userMap.getCurrentIP(currentRequest.controlObj.nick);
+
 		currentRequest.retryCount--;
 
 		if (destIP == null)
 		{
-			// TODO:: Write messages to file.
+			// Control message dropped. Do nothing as of now.
 			return;
 		}
 
@@ -140,7 +148,9 @@ public class MessageSenderThread extends Thread
 			}
 			catch (IOException e)
 			{
-				// Should never happen.
+				System.out.println("Unable to get client socket.");
+				queue.addRequest(currentRequest);
+				return;
 			}
 		}
 		try

@@ -46,15 +46,20 @@ public class LoginThread extends Thread
 		}
 
 		Boolean sendObj = false;
-		if (user.isNewUser)
+		synchronized (userMap)
 		{
-			sendObj = userMap.addNewUser(user.nick, user.pass,
-					remoteSocket.getInetAddress());
+			if (user.isNewUser)
+			{
+				sendObj = userMap.addNewUser(user.nick, user.pass,
+						remoteSocket.getInetAddress());
+			}
+			else if (userMap.logIn(user.nick, user.pass,
+					remoteSocket.getInetAddress()))
+			{
+				sendObj = true;
+				userMap.notify();
+			}
 		}
-		else if (userMap.logIn(user.nick, user.pass,
-				remoteSocket.getInetAddress()))
-			sendObj = true;
-
 		try
 		{
 			oos = new ObjectOutputStream(remoteSocket.getOutputStream());

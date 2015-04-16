@@ -34,7 +34,7 @@ public class MessageReceiverThread extends Thread
 		{
 			try
 			{
-				(new msgReceiveWorkerThread(msgServerSocket.accept(), queue))
+				(new MessageReceiveWorkerThread(msgServerSocket.accept(), queue))
 						.start();
 			}
 			catch (IOException e)

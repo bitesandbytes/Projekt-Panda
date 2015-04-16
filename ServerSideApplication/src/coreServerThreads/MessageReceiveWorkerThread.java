@@ -9,7 +9,7 @@ import common.Message;
 import coreServer.Request;
 import coreServer.RequestQueue;
 
-public class msgReceiveWorkerThread extends Thread
+public class MessageReceiveWorkerThread extends Thread
 {
 	private Socket clientSocket;
 	private ObjectInputStream ois;
@@ -17,7 +17,7 @@ public class msgReceiveWorkerThread extends Thread
 	private RequestQueue queue;
 	private int retryCount;
 
-	public msgReceiveWorkerThread(Socket client, RequestQueue queue)
+	public MessageReceiveWorkerThread(Socket client, RequestQueue queue)
 	{
 		super();
 		this.clientSocket = client;

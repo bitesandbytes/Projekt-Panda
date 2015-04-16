@@ -28,4 +28,12 @@ public class RequestQueue
 		}
 		return returnRequest;
 	}
+
+	public boolean isEmpty()
+	{
+		synchronized (requestQueue)
+		{
+			return requestQueue.isEmpty();
+		}
+	}
 }
