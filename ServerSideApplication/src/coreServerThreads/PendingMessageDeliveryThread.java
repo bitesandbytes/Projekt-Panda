@@ -3,71 +3,52 @@ package coreServerThreads;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.LinkedList;
-import java.util.Queue;
 
 import common.Message;
-
-import coreServer.UserMap;
+import coreServer.PendingQueue;
+import coreServer.User;
 
 public class PendingMessageDeliveryThread extends Thread
 {
-	private Queue<Message> messageQueue;
-	private Queue<Message> secondaryQueue;
-	private UserMap userMap;
+	private PendingQueue pendingQueue;
 	private Message curMessage;
 	private Socket clientSocket;
 	private ObjectOutputStream oos;
 	private String destIP;
-	private int msgPort = 2400;
+	private int msgPort = 2500;
 
-	public PendingMessageDeliveryThread(UserMap userMap)
+	public PendingMessageDeliveryThread(User user, String destIP)
 	{
-		this.messageQueue = new LinkedList<Message>();
-		this.secondaryQueue = new LinkedList<Message>();
-		this.userMap = userMap;
+		this.destIP = destIP;
+		this.pendingQueue = user.pendingMessageQueue;
 	}
 
 	public void run()
 	{
-		synchronized (userMap)
+		synchronized (pendingQueue)
 		{
-			while (true)
+			int maxSends = pendingQueue.getSize();
+			while (maxSends > 0)
 			{
-				curMessage = null;
-				while (!messageQueue.isEmpty())
-				{
-					curMessage = messageQueue.poll();
-					try
-					{
-						deliverCurrentMessage();
-					}
-					catch (IOException anyException)
-					{
-						secondaryQueue.add(curMessage);
-					}
-				}
-				messageQueue = secondaryQueue;
-				secondaryQueue = new LinkedList<Message>();
+				curMessage = pendingQueue.getNewPendingItem();
+				if (curMessage == null)
+					break;
 				try
 				{
-					userMap.wait();
+					deliverCurrentMessage();
 				}
-				catch (InterruptedException e)
+				catch (IOException anyException)
 				{
-					continue;
+					pendingQueue.addPendingItem(curMessage);
 				}
+				System.out.println("Delivered a pending message");
+				maxSends--;
 			}
 		}
 	}
 
 	private void deliverCurrentMessage() throws IOException
 	{
-
-		synchronized (userMap)
-		{
-			destIP = userMap.getCurrentIP(curMessage.destNick);
-		}
 		clientSocket = new Socket(destIP, msgPort);
 		oos = new ObjectOutputStream(clientSocket.getOutputStream());
 		oos.writeObject(curMessage);

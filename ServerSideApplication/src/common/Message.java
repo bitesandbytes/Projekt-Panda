@@ -9,11 +9,10 @@ public class Message implements Serializable
 	public String destNick;
 	public String content;
 
-	Message(String sn, String dn, String c)
+	public Message(String sn, String dn, String c)
 	{
 		sourceNick = sn;
 		destNick = sn;
 		content = c;
 	}
-
 }

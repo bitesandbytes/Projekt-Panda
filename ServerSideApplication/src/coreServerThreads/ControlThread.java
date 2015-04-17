@@ -18,6 +18,7 @@ public class ControlThread extends Thread
 
 	public void run()
 	{
+		System.out.println("Listening for control messages @ 3400.");
 		try
 		{
 			loginServerSocket = new ServerSocket(loginListenPort);
@@ -28,7 +29,7 @@ public class ControlThread extends Thread
 					.println("Unable to bind to the given port. Close any app using that port. \nTerminating Server.");
 			System.exit(0);
 		}
-
+		System.out.println("Got control server socket.");
 		while (true)
 		{
 			System.out.println("Waiting for new connection.");
@@ -44,6 +45,7 @@ public class ControlThread extends Thread
 					System.out
 							.println("Unable to accept connections. \nDebug.");
 				}
+				System.out.println("Accepted a connection.");
 			}
 		}
 	}

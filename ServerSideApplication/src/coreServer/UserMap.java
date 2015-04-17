@@ -1,9 +1,10 @@
 package coreServer;
 
-import java.net.InetAddress;
 import java.util.HashMap;
 
-import common.User;
+import common.LoginRequest;
+
+import coreServerThreads.PendingMessageDeliveryThread;
 
 public class UserMap
 {
@@ -24,41 +25,45 @@ public class UserMap
 		}
 	}
 
-	public boolean addNewUser(String nick, String pass, InetAddress ip)
+	public boolean addUser(LoginRequest req, String ip)
 	{
-		if (isNickUsed(nick))
+		System.out.println("Adding a new user.");
+		if (isNickUsed(req.nick))
 			return false;
 		else
 		{
 			synchronized (userMap)
 			{
-				userMap.put(nick, new User(nick, pass));
+				userMap.put(req.nick, new User(req.nick, req.pass));
 			}
 			synchronized (onlineUsers)
 			{
-				onlineUsers.put(nick, ip.getHostAddress());
+				onlineUsers.put(req.nick, ip);
 			}
 			return true;
 		}
 	}
 
-	public boolean logIn(String nick, String pass, InetAddress ip)
+	public boolean logIn(LoginRequest req, String ip)
 	{
+		System.out.println("Logging in.");
 		synchronized (userMap)
 		{
-			if (!userMap.containsKey(nick))
+			if (!userMap.containsKey(req.nick))
 				return false;
 			else
 			{
-				User newUser = new User(nick, pass);
-				if (newUser.compareTo(userMap.get(nick)) != 0)
+				User user = userMap.get(req.nick);
+				if (user.password.hashCode() != req.pass.hashCode())
 					return false;
 
 				else
 				{
 					synchronized (onlineUsers)
 					{
-						onlineUsers.put(nick, ip.getHostAddress());
+						onlineUsers.put(req.nick, ip);
+						(new PendingMessageDeliveryThread(user,
+								ip)).start();
 					}
 					return true;
 				}
@@ -85,5 +90,15 @@ public class UserMap
 		{
 			return onlineUsers.get(nick);
 		}
+	}
+
+	public PendingQueue getPendingMessageQueueFor(String nick)
+	{
+		synchronized (userMap)
+		{
+			if (userMap.containsKey(nick))
+				return userMap.get(nick).pendingMessageQueue;
+		}
+		return null;
 	}
 }

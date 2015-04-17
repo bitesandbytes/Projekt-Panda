@@ -5,12 +5,12 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
-import common.User;
+import common.LoginRequest;
 import coreServer.UserMap;
 
 public class LoginThread extends Thread
 {
-	User user;
+	LoginRequest loginReq;
 	UserMap userMap;
 	Socket remoteSocket;
 	ObjectInputStream ois;
@@ -35,31 +35,31 @@ public class LoginThread extends Thread
 			System.out.println("Unable to get input stream.");
 			return;
 		}
+		System.out.println("Got OIS. Login Thread.");
 		try
 		{
-			user = (User) ois.readObject();
+			loginReq = (LoginRequest) ois.readObject();
 		}
 		catch (ClassNotFoundException | IOException e1)
 		{
 			System.out.println("Class not found || Time out.");
 			return;
 		}
-
+		System.out.println("Got obj.");
 		Boolean sendObj = false;
-		synchronized (userMap)
+		
+		if (loginReq.isSignup)
 		{
-			if (user.isNewUser)
-			{
-				sendObj = userMap.addNewUser(user.nick, user.pass,
-						remoteSocket.getInetAddress());
-			}
-			else if (userMap.logIn(user.nick, user.pass,
-					remoteSocket.getInetAddress()))
-			{
-				sendObj = true;
-				userMap.notify();
-			}
+			sendObj = userMap.addUser(loginReq, remoteSocket.getInetAddress()
+					.getHostAddress());
 		}
+		else if (userMap.logIn(loginReq, remoteSocket.getInetAddress()
+				.getHostAddress()))
+			sendObj = true;
+		else
+			sendObj = false;
+		
+		System.out.println("Got Output obj.");
 		try
 		{
 			oos = new ObjectOutputStream(remoteSocket.getOutputStream());
@@ -69,6 +69,7 @@ public class LoginThread extends Thread
 			System.out.println("Lost connection to user.");
 			return;
 		}
+		System.out.println("Got OOS.");
 		try
 		{
 			System.out.println("Writing obj to remote socket.");
@@ -80,6 +81,7 @@ public class LoginThread extends Thread
 					.println("Unable to write to user. Possibly lost connection");
 			return;
 		}
+		System.out.println("Sent outputObj.");
 		try
 		{
 			remoteSocket.close();
@@ -89,5 +91,7 @@ public class LoginThread extends Thread
 			System.out.println("Unable to close socket. Terminating thread.");
 			return;
 		}
+		System.out.println("Closed socket.");
+		return;
 	}
 }
