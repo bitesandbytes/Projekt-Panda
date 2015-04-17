@@ -6,13 +6,15 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Scanner;
 
-import Object.User;
-
+import common.LoginRequest;
+/*
+ *  Note that LoginRequest is Equivalent to a User Object. It is used throughout to access current Client's Nick
+ */
 public class Client {
 	public static Boolean isLoggedIn = false;
 	public static Boolean isConnected = false;
-	public static User user;
-	public static ArrayList<User> friends = new ArrayList<User>();
+	public static LoginRequest user;
+	public static ArrayList<LoginRequest> friends = new ArrayList<LoginRequest>();
 	private static Scanner sc; 
 	public static void main(String [] args){
 		sc = new Scanner(System.in);
@@ -29,11 +31,11 @@ public class Client {
 		nick = sc.next();
 		System.out.println("Enter your password: ");
 		password = sc.next();
-		user = new User(nick, password);
+		user = new LoginRequest(nick, password);
 		if(loginNumber == 0)
-			user.isNewUser = true;
+			user.isSignup = true;
 		else
-			user.isNewUser = false;
+			user.isSignup = false;
 		(new LoginRequestThread(user)).start();
 		//getIP();
 		

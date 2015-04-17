@@ -1,4 +1,5 @@
-package Object;
+package common;
+
 import java.io.Serializable;
 
 public class Message implements Serializable
@@ -14,5 +15,4 @@ public class Message implements Serializable
 		destNick = sn;
 		content = c;
 	}
-
 }

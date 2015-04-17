@@ -2,8 +2,8 @@ package ClientCore;
 
 import java.util.Scanner;
 
-import Object.Message;
-import Object.MessageQueue;
+import common.Message;
+import common.MessageQueue;
 
 public class WriteMessageThread extends Thread{
 	private Scanner sc;
@@ -19,11 +19,13 @@ public class WriteMessageThread extends Thread{
 	public void run(){
 		
 		currentMessage = new Message(Client.user.nick, "", "");
-		System.out
-				.println("Established Sending connection. Type friend and message. enter message exit to exit");
 		while (true) {
+			sc = new Scanner(System.in);
+			System.out.println("WMT: Established Sending connection. Type friend and message. enter message exit to exit");
 			currentFriend = sc.next();
-			currentText = sc.next();
+			sc = new Scanner(System.in);
+			System.out.println("Enter message");
+			currentText = sc.nextLine();
 			if (currentText == "exit")
 				break;
 			currentMessage.destNick = currentFriend;
@@ -32,7 +34,7 @@ public class WriteMessageThread extends Thread{
 				messageQueue.addMessage(currentMessage);
 			}
 		}
-		System.out.println("Messages sent. Thank You. Enjoy your worthless life");
+		System.out.println("WMT: Messages sent. Thank You. Enjoy your worthless life");
 
 		
 	}
