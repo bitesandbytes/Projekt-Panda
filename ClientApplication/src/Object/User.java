@@ -1,3 +1,4 @@
+package Object;
 
 import java.io.Serializable;
 
@@ -8,7 +9,7 @@ public class User implements Serializable, Comparable<User>
 	public String pass;
 	public boolean isNewUser;
 
-	User(String nick, String pass)
+	public User(String nick, String pass)
 	{
 		this.nick = nick;
 		this.pass = pass;
