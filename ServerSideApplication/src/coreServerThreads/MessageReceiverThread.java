@@ -30,6 +30,7 @@ public class MessageReceiverThread extends Thread
 					.println("Unable to bind to the given port. Close any app using that port. \nTerminating Server.");
 			System.exit(0);
 		}
+		System.out.println("Got message server socket.");
 		while (true)
 		{
 			try
@@ -42,6 +43,7 @@ public class MessageReceiverThread extends Thread
 				System.out.println("Dropped a request.");
 				continue;
 			}
+			System.out.println("Got message request.");
 		}
 	}
 }

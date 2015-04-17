@@ -27,6 +27,7 @@ public class MessageReceiveWorkerThread extends Thread
 
 	public void run()
 	{
+		System.out.println("Spawned a message receiver worker thread.");
 		try
 		{
 			ois = new ObjectInputStream(clientSocket.getInputStream());
@@ -37,7 +38,7 @@ public class MessageReceiveWorkerThread extends Thread
 					.println("Couldn't get OIS from client socket. Terminating thread.");
 			return;
 		}
-
+		System.out.println("Got OIS / MsgRcvWorkerThread.");
 		while (retryCount > 0)
 		{
 			try
@@ -52,11 +53,14 @@ public class MessageReceiveWorkerThread extends Thread
 				retryCount--;
 			}
 		}
+		System.out.println("rcv: "+msgObj.sourceNick+msgObj.destNick+msgObj.content);
+		synchronized (queue)
+		{
+			queue.addRequest(new Request(msgObj));
 
-		queue.addRequest(new Request(msgObj));
-
-		queue.notify();
-
+			queue.notify();
+		}
+		System.out.println("Added new request Obj.");
 		return;
 	}
 

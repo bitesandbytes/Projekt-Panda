@@ -1,27 +1,27 @@
 package coreServer;
 
 import common.Message;
-import common.User;
+import common.LoginRequest;
 
 public class Request
 {
 	public boolean isMessage;
 	public Message msgContent;
-	public User controlObj; // Modify this for final deployment.
+	public LoginRequest loginRequest; // Modify this for final deployment.
 	public int retryCount;
 
 	public Request(Message msg)
 	{
 		this.isMessage = true;
 		this.msgContent = msg;
-		this.controlObj = null;
+		this.loginRequest = null;
 		this.retryCount = 3;
 	}
 
-	public Request(User controlObj)
+	public Request(LoginRequest login)
 	{
 		this.isMessage = false;
-		this.controlObj = controlObj;
+		this.loginRequest = login;
 		this.msgContent = null;
 		this.retryCount = 3;
 	}
