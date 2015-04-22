@@ -6,17 +6,29 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 import common.FileControlPacket;
+
 import coreServer.UserMap;
 
 public class FileRequestHandlerThread extends Thread
 {
 	private static int destPort = 4500;
-	private Socket srcSocket;
+
 	private UserMap userMap;
+
+	private Socket srcSocket;
+	private Socket destSocket;
+
 	private ObjectInputStream srcOIS;
-	private FileControlPacket controlPacket;
-	private int retryCount = 3;
+	private ObjectInputStream destOIS;
+
 	private ObjectOutputStream srcOOS;
+	private ObjectOutputStream destOOS;
+
+	private FileControlPacket controlPacket;
+
+	private int retryCount = 3;
+
+	private String destIP;
 
 	public FileRequestHandlerThread(UserMap map, Socket srcSocket)
 	{
@@ -46,38 +58,47 @@ public class FileRequestHandlerThread extends Thread
 			catch (ClassNotFoundException | IOException e)
 			{
 				retryCount--;
-				if(retryCount == 0)
+				if (retryCount == 0)
 				{
-					System.out.println("Unable to cast input data. Dropping request.");
+					System.out
+							.println("Class Cast Exception. Dropping request.");
 					return;
 				}
 				continue;
 			}
 		}
 		retryCount = 3;
-		String destIP = userMap.getCurrentIP(controlPacket.payload);
-		if(destIP == null)
+		destIP = userMap.getCurrentIP(controlPacket.payload);
+		if (destIP == null)
 		{
 			writeSrc(new FileControlPacket(true, "0.0.0.0", true));
 			return;
 		}
 		else
 		{
-			//TODO:: write controlPacket to client at destIP, destport as 4500.
-			try
+			while (retryCount > 0)
 			{
-				Socket destSocket = new Socket(destIP, destPort);
+				try
+				{
+					controlPacket = contactDestClient();
+					break;
+				}
+				catch (Exception e)
+				{
+					if (retryCount == 0)
+					{
+						writeSrc(new FileControlPacket(true, "0.0.0.0", true));
+						return;
+					}
+					else
+						continue;
+				}
 			}
-			catch (IOException e)
-			{
-				System.out.println();
-			}
-			
-			//TODO:: Receive acknowledgement.
-			//TODO:: Write a file control packet to client with open socket.
+			writeSrc(new FileControlPacket(true, destIP, true));
 		}
 	}
-	
+
+	// Writes "packet" to srcSocket.
 	private void writeSrc(FileControlPacket packet)
 	{
 		try
@@ -92,7 +113,7 @@ public class FileRequestHandlerThread extends Thread
 		controlPacket.isServer = true;
 		controlPacket.payload = "0.0.0.0";
 		controlPacket.isIP = true;
-		
+
 		while (retryCount > 0)
 		{
 			try
@@ -104,15 +125,28 @@ public class FileRequestHandlerThread extends Thread
 			catch (IOException e)
 			{
 				retryCount--;
-				if(retryCount == 0)
+				if (retryCount == 0)
 				{
-					System.out.println("Unable to write to src. Dropping request.");
+					System.out
+							.println("Unable to write to src. Dropping request.");
 					return;
 				}
 				continue;
 			}
 		}
 		return;
-		
+
+	}
+
+	// Writes "controlPacket" to destSocket and returns the received packet.
+	private FileControlPacket contactDestClient() throws Exception
+	{
+		destSocket = new Socket(destIP, destPort);
+		destOOS = new ObjectOutputStream(destSocket.getOutputStream());
+		destOOS.writeObject(controlPacket);
+		destOIS = new ObjectInputStream(destSocket.getInputStream());
+		FileControlPacket receivedPacket = (FileControlPacket) destOIS
+				.readObject();
+		return receivedPacket;
 	}
 }
