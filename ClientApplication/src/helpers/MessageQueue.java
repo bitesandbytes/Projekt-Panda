@@ -1,7 +1,9 @@
-package common;
+package helpers;
 
 import java.util.LinkedList;
 import java.util.Queue;
+
+import common.Message;
 
 
 public class MessageQueue {

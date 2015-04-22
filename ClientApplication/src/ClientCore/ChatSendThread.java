@@ -1,12 +1,13 @@
 package ClientCore;
 
+import helpers.MessageQueue;
+
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 
 import common.Message;
-import common.MessageQueue;
 
 public class ChatSendThread extends Thread {
 	private Socket messageSenderSocket;

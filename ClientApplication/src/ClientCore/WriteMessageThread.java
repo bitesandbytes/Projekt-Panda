@@ -1,9 +1,10 @@
 package ClientCore;
 
+import helpers.MessageQueue;
+
 import java.util.Scanner;
 
 import common.Message;
-import common.MessageQueue;
 
 public class WriteMessageThread extends Thread{
 	private Scanner sc;
