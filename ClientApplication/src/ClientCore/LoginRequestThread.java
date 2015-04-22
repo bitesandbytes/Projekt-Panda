@@ -10,7 +10,7 @@ import common.LoginRequest;
 
 public class LoginRequestThread extends Thread {
 	private Socket clientSocket;
-	private final static String destIP = "192.168.1.221";
+	private final static String destIP = "10.42.0.27";
 	private final static int destPort = 3400;
 	private final static String hostIP = "192.168.1.208";
 	private final static int hostPort = 3500;

@@ -14,7 +14,7 @@ public class ChatSendThread extends Thread {
 	private Message currentMessage;
 	public MessageQueue messageQueue;
 	
-	private final static String serverIP = "192.168.1.221";
+	private final static String serverIP = "10.42.0.27";
 	private final static int messageSendPort = 2400;
 
 
