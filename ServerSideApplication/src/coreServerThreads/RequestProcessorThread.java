@@ -64,13 +64,12 @@ public class RequestProcessorThread extends Thread
 
 	private void writeMsg()
 	{
-		synchronized (userMap)
-		{
-			pendingQueue = userMap
-					.getPendingMessageQueueFor(currentRequest.msgContent.destNick);
-			destIP = userMap.getCurrentIP(currentRequest.msgContent.destNick);
-		}
+		System.out.println("Trying to write a message.");
+		pendingQueue = userMap
+				.getPendingMessageQueueFor(currentRequest.msgContent.destNick);
+		destIP = userMap.getCurrentIP(currentRequest.msgContent.destNick);
 
+		System.out.println("Got destIP and pending queue.");
 		if (pendingQueue == null)
 		{
 			System.out.println("Unauthorized access.");
@@ -85,7 +84,7 @@ public class RequestProcessorThread extends Thread
 			}
 			return;
 		}
-
+		System.out.println("writing now.");
 		currentRequest.retryCount--;
 		try
 		{
@@ -94,8 +93,10 @@ public class RequestProcessorThread extends Thread
 		catch (IOException e)
 		{
 			pendingQueue.addPendingItem(currentRequest.msgContent);
+			System.out.println("unable to write | IOException.");
 			return;
 		}
+		System.out.println("Wrote a message.");
 		return;
 	}
 
