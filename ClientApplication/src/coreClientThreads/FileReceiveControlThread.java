@@ -7,6 +7,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 import common.FileControlPacket;
+import coreClient.Global;
 
 public class FileReceiveControlThread extends Thread
 {
@@ -14,7 +15,7 @@ public class FileReceiveControlThread extends Thread
 	private ObjectInputStream inStream;
 	private ObjectOutputStream outStream;
 	private FileControlPacket fileControlPack;
-	private final static int fileControlReceivePort = 4500;
+	private final static int fileControlReceivePort = Global.clientFilePort;
 	private String receiveFileName;
 
 	public FileReceiveControlThread()

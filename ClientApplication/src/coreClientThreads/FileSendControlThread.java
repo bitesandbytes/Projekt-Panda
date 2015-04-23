@@ -12,7 +12,7 @@ public class FileSendControlThread extends Thread
 {
 	private Socket fileSendControlSocket;
 	private final static String serverIP = Global.serverIP;
-	private final static int fileControlPort = Global.fileControlPort;
+	private final static int fileControlPort = Global.clientFilePort;
 	private ObjectOutputStream outStream;
 	private ObjectInputStream inStream;
 	private String destNick;
