@@ -49,6 +49,8 @@ public class WriteUserInputThread extends Thread {
 			if (currentAction.equals("message")) {
 				currentMessage.destNick = currentFriend;
 				currentMessage.content = currentText;
+				System.out.println("currentMessage.destNick :" + currentMessage.destNick);
+				System.out.println("currentMessage.content :" + currentMessage.content);
 				synchronized (messageQueue) {
 					messageQueue.addMessage(currentMessage);
 				}
