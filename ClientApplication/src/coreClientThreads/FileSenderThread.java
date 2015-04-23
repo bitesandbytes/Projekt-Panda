@@ -13,7 +13,6 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.SocketChannel;
 
 import common.FileControlPacket;
-
 import coreClient.Global;
 
 public class FileSenderThread extends Thread
@@ -97,13 +96,17 @@ public class FileSenderThread extends Thread
 			try
 			{
 				Socket otherClient = new Socket(destIP, fileSendPort);
+				System.out.println("Got client socket | FileSenderThread");
 				ObjectOutputStream oos = new ObjectOutputStream(
 						otherClient.getOutputStream());
+				System.out.println("Got OOS | FileSenderThread");
 				FileControlPacket sendPacket = new FileControlPacket(false,
 						null, false);
 				sendPacket.fileName = filename;
 				oos.writeObject(sendPacket);
+				System.out.println("Wrote sendPacket | FileSenderThread");
 				otherClient.close();
+				System.out.println("Closing client socket | FileSenderThread");
 				break;
 			}
 			catch (IOException ioEx)
