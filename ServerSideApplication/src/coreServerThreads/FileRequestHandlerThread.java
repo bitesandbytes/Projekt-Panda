@@ -98,7 +98,10 @@ public class FileRequestHandlerThread extends Thread
 						return;
 					}
 					else
+					{
+						retryCount--;
 						continue;
+					}
 				}
 			}
 			writeSrc(new FileControlPacket(true, destIP, true));
