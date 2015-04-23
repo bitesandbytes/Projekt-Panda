@@ -32,7 +32,7 @@ public class ChatSendThread extends Thread {
 		 * of false.Gives indication whether server was able to request a
 		 * connection and currentFriend accepted it.
 		 */
-		(new WriteMessageThread(messageQueue)).start();
+		(new WriteUserInputThread(messageQueue)).start();
 		while(true){
 			currentMessage = null;
 			synchronized (messageQueue) {

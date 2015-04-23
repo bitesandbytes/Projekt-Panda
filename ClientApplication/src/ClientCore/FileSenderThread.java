@@ -10,15 +10,16 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.SocketChannel;
 
-public class FileSendThread extends Thread {
+public class FileSenderThread extends Thread {
 	public static String filePath;
 	private static SocketChannel socketChannel = null;
-	private final static String destIP = "10.42.0.27";
+	private static String destIP;
 	private final static int fileSendPort = 4500;
 	
-	public FileSendThread(String f){
+	public FileSenderThread(String f, String dip){
 		super();
 		filePath = f;
+		destIP = dip;
 	}
 	
 	public void run(){
@@ -33,7 +34,7 @@ public class FileSendThread extends Thread {
 
 		} catch (IOException e)
 		{
-			System.out.println("Unable to connect to socket");
+			System.out.println("FST: Unable to connect to socket");
 		}
 		RandomAccessFile aFile = null;
 		try
@@ -49,18 +50,18 @@ public class FileSendThread extends Thread {
 				buffer.clear();
 			}
 			Thread.sleep(1000);
-			System.out.println("End of file reached..");
+			System.out.println("FST: File Successfully Sent");
 			socketChannel.close();
 			aFile.close();
 		} catch (FileNotFoundException e)
 		{
-			System.out.println("Unable to locate File");
+			System.out.println("FST: Unable to locate File");
 		} catch (IOException e)
 		{
-			System.out.println("IOException");
+			System.out.println("FST: IOException");
 		} catch (InterruptedException e)
 		{
-			System.out.println("InterruptedException");
+			System.out.println("FST: InterruptedException");
 		}
 	}
 }
