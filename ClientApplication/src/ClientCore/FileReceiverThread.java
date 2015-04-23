@@ -1,5 +1,7 @@
 package ClientCore;
 
+import helpers.Global;
+
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.net.InetSocketAddress;
@@ -10,9 +12,8 @@ import java.nio.channels.SocketChannel;
 
 public class FileReceiverThread extends Thread
 {
-	private static int listenPort = 4500;
-	//Default File Path
-	private static String fileDestination = "/home/akshay/Documents/";
+	private static int listenPort = Global.clientFilePort;
+	private static String fileDestination = Global.defaultFileSavePath;
 	private static String fileName;
 
 	public FileReceiverThread(String fn)
@@ -31,7 +32,7 @@ public class FileReceiverThread extends Thread
 		}
 		catch (IOException e)
 		{
-			System.out.println("Failed to receive file. Try agian.");
+			System.out.println("File receive failed | FileReceiverThread.");
 			return;
 		}
 		fileName = null;
