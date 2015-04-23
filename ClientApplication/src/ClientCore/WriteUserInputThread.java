@@ -25,23 +25,28 @@ public class WriteUserInputThread extends Thread {
 			currentMessage.destNick = "";
 			currentMessage.content = "";
 			currentAction = "";
+			currentFriend = "";
 			currentText = "";
 			sc = new Scanner(System.in);
 			System.out
 					.println("WMT: Established Sending connection. Type 'message' or 'file' or 'exit'");
 			currentAction = sc.next();
-			if (currentAction == "exit")
+			if (currentAction.equals("exit"))
 				break;
+			
+			
 			sc = new Scanner(System.in);
 			System.out.println("Enter Friend's Nick:");
 			currentFriend = sc.next();
+			
+			
 			sc = new Scanner(System.in);
-			if (currentAction == "message")
+			if (currentAction.equals("message"))
 				System.out.println("Enter message:");
 			else
 				System.out.println("Enter Valid File Path:");
 			currentText = sc.nextLine();
-			if (currentAction == "message") {
+			if (currentAction.equals("message")) {
 				currentMessage.destNick = currentFriend;
 				currentMessage.content = currentText;
 				synchronized (messageQueue) {

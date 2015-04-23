@@ -34,14 +34,14 @@ public class FileSendControlThread extends Thread {
 			fileSendControlSocket.connect(new InetSocketAddress(serverIP,
 					fileControlPort));
 		} catch (IOException e1) {
-			System.out.println("FSIT: Could not connect to server.");
+			System.out.println("FSCT: Could not connect to server.");
 		}
-		System.out.println("FSIT: Intializing output Stream");
+		System.out.println("FSCT: Intializing output Stream");
 		try {
 			outStream = new ObjectOutputStream(
 					fileSendControlSocket.getOutputStream());
 		} catch (IOException e) {
-			System.out.println("FSIT: Unable to initialize output Stream");
+			System.out.println("FSCT: Unable to initialize output Stream");
 		}
 		fileControlPack = new FileControlPacket(false, destNick, false);
 		fileControlPack.fileName = fileName;
@@ -49,26 +49,26 @@ public class FileSendControlThread extends Thread {
 			outStream.writeObject(fileControlPack);
 			outStream.flush();
 		} catch (IOException e) {
-			System.out.println("FSIT: Unable to write into output stream.");
+			System.out.println("FSCT: Unable to write into output stream.");
 		}
 		try {
 			inStream = new ObjectInputStream(
 					fileSendControlSocket.getInputStream());
 		} catch (IOException e) {
-			System.out.println("FSIT: Unable to initialize input Stream");
+			System.out.println("FSCT: Unable to initialize input Stream");
 		}
 		try {
 			fileControlPack = (FileControlPacket) inStream.readObject();
 		} catch (ClassNotFoundException | IOException e) {
 			System.out
-					.println("FSIT: Unable to read input as FileControlPacket object");
+					.println("FSCT: Unable to read input as FileControlPacket object");
 		}
 		try {
 			fileSendControlSocket.close();
 		} catch (IOException e) {
 		}
 		if (fileControlPack.isIP == false) {
-			System.out.println("FSIT: User is offline. Try Again Later");
+			System.out.println("FSCT: User is offline. Try Again Later");
 		} else {
 			(new FileSenderThread(filePath, fileControlPack.payload)).start();
 
