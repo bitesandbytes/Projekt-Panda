@@ -12,7 +12,7 @@ public class FileSendControlThread extends Thread
 {
 	private Socket fileSendControlSocket;
 	private final static String serverIP = Global.serverIP;
-	private final static int fileControlPort = Global.clientFilePort;
+	private final static int fileControlPort = Global.serverFileRequestPort;
 	private ObjectOutputStream outStream;
 	private ObjectInputStream inStream;
 	private String destNick;
@@ -29,12 +29,14 @@ public class FileSendControlThread extends Thread
 
 	public void run()
 	{
+		System.out.println("File Sent Request Found.");
 		String[] temp;
 		temp = filePath.split("/");
 		fileName = temp[temp.length - 1];
 		fileControlPack = new FileControlPacket(false, destNick, false);
 		fileControlPack.fileName = fileName;
 		int retryCount = 3;
+		System.out.println("FSCT: Pinging server for Client IP.");
 		while (retryCount > 0)
 		{
 			try
@@ -50,6 +52,7 @@ public class FileSendControlThread extends Thread
 				continue;
 			}
 		}
+		System.out.println("FSCT: Successfully Pinged Server. Waiting For Server to Send Back Control Packet");
 		retryCount = 3;
 		while (retryCount > 0)
 		{
@@ -72,12 +75,14 @@ public class FileSendControlThread extends Thread
 				return;
 			}
 		}
+		
 		if (fileControlPack.isIP == false)
 		{
 			System.out.println("FSCT: User is offline. Try Again Later");
 		}
 		else
-		{
+		{	
+			System.out.println("FSCT: Setting up connection directly to client");
 			(new FileSenderThread(filePath, fileControlPack.payload)).start();
 
 		}
