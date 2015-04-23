@@ -113,6 +113,7 @@ public class FileRequestHandlerThread extends Thread
 	private void writeSrc(FileControlPacket packet)
 	{
 		System.out.println("Contacting srcClient.");
+		System.out.println("Writing  "+packet.isServer+":"+packet.payload+":"+packet.isIP+" to src.");
 		try
 		{
 			srcOOS = new ObjectOutputStream(srcSocket.getOutputStream());
