@@ -5,6 +5,7 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 import common.Message;
+import coreClient.Global;
 import coreClient.MessageQueue;
 
 public class ChatSendThread extends Thread
@@ -14,13 +15,14 @@ public class ChatSendThread extends Thread
 	private Message currentMessage;
 	public MessageQueue messageQueue;
 
-	private final static String serverIP = "10.42.0.27";
-	private final static int messageSendPort = 2400;
+	private final static String serverIP = Global.serverIP;
+	private final static int messageSendPort = Global.serverMsgPort;
 
 	public ChatSendThread()
 	{
 		super();
 		messageQueue = new MessageQueue();
+		(new WriteUserInputThread(messageQueue)).start();
 	}
 
 	private void sendMessageObj() throws IOException
@@ -37,14 +39,12 @@ public class ChatSendThread extends Thread
 		outStream.writeObject(currentMessage);
 		outStream.flush();
 		System.out.println("CST: Message Sent");
-
+		return;
 	}
 
 	public void run()
 	{
 		System.out.println("Started Chat Sender Thread");
-		(new WriteUserInputThread(messageQueue)).start();
-
 		/*
 		 * For Feedback. One can have a server input coming in here saying true
 		 * of false.Gives indication whether server was able to request a
@@ -53,19 +53,35 @@ public class ChatSendThread extends Thread
 
 		while (true)
 		{
-			currentMessage = null;
+			waitForNotify();
+			deliverMessage();
+		}
+	}
+
+	private void waitForNotify()
+	{
+
+		while (messageQueue.size() == 0)
+		{
 			synchronized (messageQueue)
 			{
-				if (messageQueue.size() == 0)
-					try
-					{
-						messageQueue.wait();
-					}
-					catch (InterruptedException e)
-					{
-						break;
-					}
+				try
+				{
+					messageQueue.wait();
+				}
+				catch (InterruptedException e)
+				{
+					continue;
+				}
 			}
+		}
+		return;
+	}
+
+	private void deliverMessage()
+	{
+		while (messageQueue.size() > 0)
+		{
 			currentMessage = messageQueue.getMessage();
 			int retryCount = 3;
 			while (retryCount > 0)
@@ -88,5 +104,4 @@ public class ChatSendThread extends Thread
 			}
 		}
 	}
-
 }

@@ -9,10 +9,10 @@ import coreClient.MessageQueue;
 public class WriteUserInputThread extends Thread
 {
 	private Scanner sc;
-	private String currentAction;
-	private String currentText;
-	private String currentFriend;
-	private Message currentMessage;
+	private String curAction;
+	private String curText;
+	private String curFriend;
+	private Message curMessage;
 	public MessageQueue messageQueue;
 
 	public WriteUserInputThread(MessageQueue mq)
@@ -25,49 +25,48 @@ public class WriteUserInputThread extends Thread
 	public void run()
 	{
 
-		currentMessage = new Message(Client.user.nick, "", "");
+		curMessage = new Message(Client.user.nick, "", "");
+		sc = new Scanner(System.in);
 		while (true)
 		{
-			currentMessage.destNick = "";
-			currentMessage.content = "";
-			currentAction = "";
-			currentFriend = "";
-			currentText = "";
-			sc = new Scanner(System.in);
 			System.out
-					.println("WMT: Established Sending connection. Type 'message' or 'file' or 'exit'");
-			currentAction = sc.next();
-			if (currentAction.equals("exit"))
-				break;
+					.println("WMT: Established Sending connection. Type 'm' or 'f' or 'exit'");
 
 			sc = new Scanner(System.in);
+			curAction = sc.next();
+
+			if (curAction.equals("exit"))
+				System.exit(0);
+
 			System.out.println("Enter Friend's Nick:");
-			currentFriend = sc.next();
-
 			sc = new Scanner(System.in);
-			if (currentAction.equals("message"))
+			curFriend = sc.next();
+
+			if (curAction.equals("m"))
 				System.out.println("Enter message:");
 			else
 				System.out.println("Enter Valid File Path:");
-			currentText = sc.nextLine();
-			if (currentAction.equals("message"))
-			{
-				currentMessage.destNick = currentFriend;
-				currentMessage.content = currentText;
-				System.out.println("currentMessage.destNick :"
-						+ currentMessage.destNick);
-				System.out.println("currentMessage.content :"
-						+ currentMessage.content);
+			
+			sc = new Scanner(System.in);
+			curText = sc.nextLine();
 
-				messageQueue.addMessage(currentMessage);
+			if (curAction.equals("m"))
+			{
+				curMessage.destNick = curFriend;
+				curMessage.content = curText;
+				synchronized (messageQueue)
+				{
+					messageQueue.addMessage(curMessage);
+					messageQueue.notify();
+				}
 			}
+			else if (curAction.equals("f"))
+				(new FileSendControlThread(curFriend, curText)).start();
 			else
 			{
-				(new FileSendControlThread(currentFriend, currentText)).start();
+				System.out.println("Invalid input. ");
+				continue;
 			}
 		}
-		System.out
-				.println("WMT: Messages sent. Thank You. Enjoy your worthless life");
-
 	}
 }
