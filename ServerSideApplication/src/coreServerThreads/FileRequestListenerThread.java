@@ -34,6 +34,7 @@ public class FileRequestListenerThread extends Thread
 			try
 			{
 				(new FileRequestHandlerThread(userMap, serverSocket.accept())).start();
+				System.out.println("Got new file request. | FileRequestListenerThread");
 			}
 			catch (IOException e)
 			{

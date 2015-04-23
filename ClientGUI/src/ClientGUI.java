@@ -12,8 +12,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JPasswordField;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
-
 import java.awt.Cursor;
 
 public class ClientGUI
@@ -27,9 +25,13 @@ public class ClientGUI
 	 */
 	public static void main(String[] args)
 	{
-		try {
-			UIManager.setLookAndFeel("com.jtattoo.plaf.graphite.GraphiteLookAndFeel");
-		} catch (Throwable e) {
+		try
+		{
+			UIManager
+					.setLookAndFeel("com.jtattoo.plaf.graphite.GraphiteLookAndFeel");
+		}
+		catch (Throwable e)
+		{
 			e.printStackTrace();
 		}
 		EventQueue.invokeLater(new Runnable()
@@ -70,7 +72,7 @@ public class ClientGUI
 		loginScreen.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		loginScreen.getContentPane().setLayout(null);
 		loginScreen.setResizable(false);
-		
+
 		JLabel lblNick = new JLabel("Nick");
 		lblNick.setBounds(64, 63, 70, 15);
 		loginScreen.getContentPane().add(lblNick);

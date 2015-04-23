@@ -16,8 +16,8 @@ public class ServerMain
 
 	public static void main(String[] args)
 	{
-		userMap.addUser(new LoginRequest("1234", "1234"), "0");
-		userMap.addUser(new LoginRequest("12345", "12345"), "0");
+		userMap.addUser(new LoginRequest("1", "1"), "0");
+		userMap.addUser(new LoginRequest("12", "12"), "0");
 		ControlThread controlThread = new ControlThread(userMap);
 		MessageReceiverThread messageReciever = new MessageReceiverThread(
 				queue);

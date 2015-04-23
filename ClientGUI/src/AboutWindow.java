@@ -5,6 +5,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
+import javax.swing.UIManager;
 
 
 public class AboutWindow extends JFrame
@@ -18,6 +19,11 @@ public class AboutWindow extends JFrame
 	 */
 	public static void main(String[] args)
 	{
+		try {
+			UIManager.setLookAndFeel("com.jtattoo.plaf.graphite.GraphiteLookAndFeel");
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
 		EventQueue.invokeLater(new Runnable()
 		{
 			public void run()
@@ -26,6 +32,7 @@ public class AboutWindow extends JFrame
 				{
 					AboutWindow frame = new AboutWindow();
 					frame.setVisible(true);
+					frame.setResizable(false);
 				}
 				catch (Exception e)
 				{
