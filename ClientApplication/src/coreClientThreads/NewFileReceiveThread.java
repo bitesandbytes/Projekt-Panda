@@ -36,6 +36,7 @@ public class NewFileReceiveThread extends Thread
 			}
 			catch (ClassNotFoundException | IOException e)
 			{
+				System.out.println("Dropped a file transfer. Request transfer again.");
 				continue;
 			}
 		}
@@ -45,12 +46,19 @@ public class NewFileReceiveThread extends Thread
 	private String getFilename() throws IOException, ClassNotFoundException
 	{
 		ServerSocket controlServer = new ServerSocket(listenPort);
+		System.out.println("Got controlServerSocket | NewReceiverThread");
 		Socket clientSocket = controlServer.accept();
+		System.out.println("Got clientSocket | NewReceiverThread");
 		ObjectInputStream ois = new ObjectInputStream(clientSocket.getInputStream());
+		System.out.println("Got OOS | NewReceiverThread");
 		FileControlPacket rcvPacket = (FileControlPacket) ois.readObject();
+		System.out.println("Received controlPacket | NewReceiverThread");
 		clientSocket.close();
+		System.out.println("Closed connection | NewReceiverThread");
 		controlServer.setReuseAddress(true);
+		System.out.println("Enabling reuse | NewReceiverThread");
 		controlServer.close();
+		System.out.println("Got filename | NewReceiverThread");
 		return rcvPacket.fileName;
 	}
 	
@@ -59,11 +67,14 @@ public class NewFileReceiveThread extends Thread
 		ServerSocketChannel serverSocketChannel = null;
 		SocketChannel socketChannel = null;
 		serverSocketChannel = ServerSocketChannel.open();
+		System.out.println("Opening serverSocketChannel | NewReceiverThread");
 		serverSocketChannel.socket().bind(new InetSocketAddress(listenPort));
+		System.out.println("severSocketChannel Bind successful | NewReceiverThread");
 		socketChannel = serverSocketChannel.accept();
 		System.out.println("Receiving file from "
 				+ socketChannel.getRemoteAddress());
 		serverSocketChannel.close();
+		System.out.println("serverSocketChannel closed | NewReceiverThread");
 		return socketChannel;
 	}
 	private void readFromSocket(SocketChannel socketChannel, String filename) throws IOException
