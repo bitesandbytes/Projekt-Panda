@@ -91,16 +91,21 @@ public class FileSendControlThread extends Thread
 	private void receiveFileControlPacket() throws IOException,
 			ClassNotFoundException
 	{
+		System.out.println("FSCT: Initializing Input Stream");
 		inStream = new ObjectInputStream(fileSendControlSocket.getInputStream());
+		System.out.println("FSCT: Reading FileControlPacket Object");
 		fileControlPack = (FileControlPacket) inStream.readObject();
 		fileSendControlSocket.close();
 	}
 
 	private void sendFileControlPacket() throws IOException
 	{
+		System.out.println("FSCT: Setting up a socket Connection");
 		fileSendControlSocket = new Socket(serverIP, fileControlPort);
+		System.out.println("FSCT: Initializing Output Stream");
 		outStream = new ObjectOutputStream(
 				fileSendControlSocket.getOutputStream());
+		System.out.println("FSCT: Writing FIleControlPacket into outStream");
 		outStream.writeObject(fileControlPack);
 		outStream.flush();
 	}
