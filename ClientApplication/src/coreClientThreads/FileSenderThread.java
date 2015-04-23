@@ -3,31 +3,42 @@ package coreClientThreads;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.io.RandomAccessFile;
 import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.SocketChannel;
+
+import common.FileControlPacket;
 
 import coreClient.Global;
 
 public class FileSenderThread extends Thread
 {
 	public static String filePath;
+	public static String filename;
 	private static SocketChannel socketChannel = null;
 	private static String destIP;
 	private final static int fileSendPort = Global.clientFilePort;
 
-	public FileSenderThread(String f, String dip)
+	public FileSenderThread(String path, String name, String dip)
 	{
 		super();
-		filePath = f;
+		filePath = path;
+		filename = name;
 		destIP = dip;
 	}
 
 	public void run()
 	{
+		if (!sendFilename())
+		{
+			System.out.println("Unable to establish connection. Try again.");
+			return;
+		}
 		socketChannel = null;
 		try
 		{
@@ -76,5 +87,34 @@ public class FileSenderThread extends Thread
 		{
 			System.out.println("Thread Sleep Interrupted | FileSenderThread.");
 		}
+	}
+
+	private boolean sendFilename()
+	{
+		int retryCount = 3;
+		while (retryCount > 0)
+		{
+			try
+			{
+				Socket otherClient = new Socket(destIP, fileSendPort);
+				ObjectOutputStream oos = new ObjectOutputStream(
+						otherClient.getOutputStream());
+				FileControlPacket sendPacket = new FileControlPacket(false,
+						null, false);
+				sendPacket.fileName = filename;
+				oos.writeObject(sendPacket);
+				otherClient.close();
+				break;
+			}
+			catch (IOException ioEx)
+			{
+				retryCount--;
+				if (retryCount == 0)
+					return false;
+				else
+					continue;
+			}
+		}
+		return true;
 	}
 }
