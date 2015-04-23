@@ -18,6 +18,7 @@ public class FileRequestListenerThread extends Thread
 	
 	public void run()
 	{
+		System.out.println("Starting file request listener thread.");
 		try
 		{
 			serverSocket = new ServerSocket(fileRequestListenPort);
@@ -27,6 +28,7 @@ public class FileRequestListenerThread extends Thread
 			System.out.println("Unable to bind to 4400. Terminate any servers binding to that port.");
 			return;
 		}
+		System.out.println("Got file server socket.");
 		while(true)
 		{
 			try

@@ -1,9 +1,5 @@
 package ClientCore;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.Scanner;
 
 import common.LoginRequest;
@@ -37,31 +33,5 @@ public class Client {
 		else
 			user.isSignup = false;
 		(new LoginRequestThread(user)).start();
-		//getIP();
-		
-	}
-	public static void getIP(){
-		try
-        {
-            Enumeration<?> e = NetworkInterface.getNetworkInterfaces();
-            while(e.hasMoreElements())
-            {
-                NetworkInterface n = (NetworkInterface) e.nextElement();
-                Enumeration<?> ee = n.getInetAddresses();
-                int count = 0;
-                while (ee.hasMoreElements())
-                {
-                	count++;
-                    InetAddress i = (InetAddress) ee.nextElement();
-                    String address; 
-                    address = i.getHostAddress(); 
-                    System.out.println(count +" : " + address);
-                }
-            } 
-        }
-        catch( SocketException SE)
-        {
-            SE.printStackTrace();
-        }
 	}
 }

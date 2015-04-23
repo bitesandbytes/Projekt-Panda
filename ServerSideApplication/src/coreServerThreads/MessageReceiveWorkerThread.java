@@ -53,7 +53,12 @@ public class MessageReceiveWorkerThread extends Thread
 				retryCount--;
 			}
 		}
-		System.out.println("rcv: "+msgObj.sourceNick+" -> "+msgObj.destNick+" : "+msgObj.content);
+		if (msgObj.destNick == null)
+			return;
+		else if (msgObj.destNick.equals(""))
+			return;
+		System.out.println("rcv: " + msgObj.sourceNick + " -> "
+				+ msgObj.destNick + " : " + msgObj.content);
 		synchronized (queue)
 		{
 			queue.addRequest(new Request(msgObj));
