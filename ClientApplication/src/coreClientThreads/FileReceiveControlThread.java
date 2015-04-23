@@ -98,6 +98,8 @@ public class FileReceiveControlThread extends Thread
 			}
 			receiveFileName = fileControlPack.fileName;
 			retryCount = 3;
+			
+			System.out.println("FRCT: Sending FileControl Packet To server");
 			while (retryCount > 0)
 			{
 				try
@@ -113,6 +115,7 @@ public class FileReceiveControlThread extends Thread
 					continue;
 				}
 			}
+			System.out.println("FRCT: Setting up Receive Thread From server.");
 			break;
 			// Break and Start FileReceiverThread
 		}
