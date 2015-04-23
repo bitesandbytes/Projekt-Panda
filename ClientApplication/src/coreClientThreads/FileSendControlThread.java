@@ -1,6 +1,4 @@
-package ClientCore;
-
-import helpers.Global;
+package coreClientThreads;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -8,6 +6,7 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 import common.FileControlPacket;
+import coreClient.Global;
 
 public class FileSendControlThread extends Thread
 {

@@ -1,8 +1,9 @@
-package ClientCore;
+package clientMain;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 import common.LoginRequest;
+import coreClientThreads.LoginRequestThread;
 /*
  *  Note that LoginRequest is Equivalent to a User Object. It is used throughout to access current Client's Nick
  */

@@ -1,14 +1,14 @@
-package ClientCore;
-
-import helpers.MessageQueue;
+package coreClientThreads;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 import common.Message;
+import coreClient.MessageQueue;
 
-public class ChatSendThread extends Thread {
+public class ChatSendThread extends Thread
+{
 	private Socket messageSenderSocket;
 	private ObjectOutputStream outStream;
 	private Message currentMessage;
@@ -17,12 +17,14 @@ public class ChatSendThread extends Thread {
 	private final static String serverIP = "10.42.0.27";
 	private final static int messageSendPort = 2400;
 
-	public ChatSendThread() {
+	public ChatSendThread()
+	{
 		super();
 		messageQueue = new MessageQueue();
 	}
 
-	public void sendMessageObj() throws IOException {
+	private void sendMessageObj() throws IOException
+	{
 		System.out.println("CST: Establishing a socket connection");
 		messageSenderSocket = new Socket(serverIP, messageSendPort);
 		System.out.println("CST: Intializing output Stream");
@@ -38,7 +40,8 @@ public class ChatSendThread extends Thread {
 
 	}
 
-	public void run() {
+	public void run()
+	{
 		System.out.println("Started Chat Sender Thread");
 		(new WriteUserInputThread(messageQueue)).start();
 
@@ -48,26 +51,36 @@ public class ChatSendThread extends Thread {
 		 * connection and currentFriend accepted it.
 		 */
 
-		while (true) {
+		while (true)
+		{
 			currentMessage = null;
-			synchronized (messageQueue) {
+			synchronized (messageQueue)
+			{
 				if (messageQueue.size() == 0)
-					try {
+					try
+					{
 						messageQueue.wait();
-					} catch (InterruptedException e) {
+					}
+					catch (InterruptedException e)
+					{
 						break;
 					}
 			}
 			currentMessage = messageQueue.getMessage();
 			int retryCount = 3;
-			while (retryCount > 0) {
-				try {
+			while (retryCount > 0)
+			{
+				try
+				{
 					sendMessageObj();
 					break;
-				} catch (IOException ex) {
+				}
+				catch (IOException ex)
+				{
 					retryCount--;
 					System.out.println("CST: Retrying send ...");
-					if (retryCount == 0) {
+					if (retryCount == 0)
+					{
 						System.out.println("CST: Unable to send to server.");
 						return;
 					}

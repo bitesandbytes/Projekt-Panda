@@ -1,6 +1,4 @@
-package ClientCore;
-
-import helpers.Global;
+package coreClientThreads;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -9,6 +7,8 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
+
+import coreClient.Global;
 
 public class FileReceiverThread extends Thread
 {
@@ -36,10 +36,10 @@ public class FileReceiverThread extends Thread
 			return;
 		}
 		fileName = null;
-		(new FileReceiveControlThread()).start(); 
+		(new FileReceiveControlThread()).start();
 	}
 
-	public SocketChannel getNewServerSocketChannel() throws IOException
+	private SocketChannel getNewServerSocketChannel() throws IOException
 	{
 
 		ServerSocketChannel serverSocketChannel = null;
@@ -52,10 +52,10 @@ public class FileReceiverThread extends Thread
 		return socketChannel;
 	}
 
-	public void readFromSocket(SocketChannel socketChannel) throws IOException
+	private void readFromSocket(SocketChannel socketChannel) throws IOException
 	{
 		RandomAccessFile file = null;
-		file = new RandomAccessFile(fileDestination+fileName, "rw");
+		file = new RandomAccessFile(fileDestination + fileName, "rw");
 		ByteBuffer buffer = ByteBuffer.allocate(1024);
 		FileChannel fileChannel = file.getChannel();
 		while (socketChannel.read(buffer) > 0)

@@ -1,6 +1,4 @@
-package ClientCore;
-
-import helpers.Global;
+package coreClientThreads;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -11,6 +9,8 @@ import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.SocketChannel;
+
+import coreClient.Global;
 
 public class FileSenderThread extends Thread
 {

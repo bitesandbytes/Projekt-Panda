@@ -1,15 +1,15 @@
-package helpers;
+package coreClient;
 
 import java.util.LinkedList;
 import java.util.Queue;
 
 import common.Message;
 
+public class MessageQueue
+{
 
-public class MessageQueue {
-	
 	private Queue<Message> messageQueue;
-	
+
 	public MessageQueue()
 	{
 		messageQueue = new LinkedList<Message>();
@@ -33,7 +33,9 @@ public class MessageQueue {
 		}
 		return returnMessage;
 	}
-	public int size(){
+
+	public int size()
+	{
 		return messageQueue.size();
 	}
 

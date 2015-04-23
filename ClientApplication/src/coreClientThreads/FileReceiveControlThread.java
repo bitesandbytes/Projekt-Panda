@@ -1,4 +1,4 @@
-package ClientCore;
+package coreClientThreads;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -8,45 +8,56 @@ import java.net.Socket;
 
 import common.FileControlPacket;
 
-public class FileReceiveControlThread extends Thread {
-	private Socket messageReceiverSocket;
+public class FileReceiveControlThread extends Thread
+{
+	private Socket fileReceiveControlSocket;
 	private ObjectInputStream inStream;
 	private ObjectOutputStream outStream;
 	private FileControlPacket fileControlPack;
 	private final static int fileControlReceivePort = 4500;
 	private String receiveFileName;
 
-	public FileReceiveControlThread() {
+	public FileReceiveControlThread()
+	{
 		super();
 	}
-	
-	public void receiveFileControlPacket() throws IOException, ClassNotFoundException{
+
+	@SuppressWarnings("resource")
+	private void receiveFileControlPacket() throws IOException,
+			ClassNotFoundException
+	{
 		System.out.println("FRCT: Accepting connection");
-		messageReceiverSocket = new Socket();
-		messageReceiverSocket = (new ServerSocket(fileControlReceivePort)).accept();
+		fileReceiveControlSocket = new Socket();
+		fileReceiveControlSocket = (new ServerSocket(fileControlReceivePort))
+				.accept();
 		System.out.println("FRCT: Initializing input Stream");
-		inStream = new ObjectInputStream(messageReceiverSocket.getInputStream());
+		inStream = new ObjectInputStream(
+				fileReceiveControlSocket.getInputStream());
 		System.out.println("FRCT: Attempting to read FileControlPacket Object");
 		fileControlPack = (FileControlPacket) inStream.readObject();
-		
+
 	}
-	
-	public void sendFileControlPacket() throws IOException{
+
+	private void sendFileControlPacket() throws IOException
+	{
 		System.out.println("FRCT: Initializing output Stream");
-		outStream = new ObjectOutputStream(messageReceiverSocket.getOutputStream());
+		outStream = new ObjectOutputStream(
+				fileReceiveControlSocket.getOutputStream());
 		fileControlPack.isServer = false;
 		System.out.println("FRCT: Writing FileControlPacket output Stream");
 		outStream.writeObject(fileControlPack);
 		outStream.flush();
 		System.out.println("FRCT: Closing Socket");
-		messageReceiverSocket.close();
-		
+		fileReceiveControlSocket.close();
+
 	}
-	
-	public void run() {
-		while (true) {
+
+	public void run()
+	{
+		while (true)
+		{
 			fileControlPack = null;
-			int retryCount = 3;	//should be very high
+			int retryCount = 3; // should be very high
 			while (retryCount > 0)
 			{
 				try
@@ -68,12 +79,17 @@ public class FileReceiveControlThread extends Thread {
 					return;
 				}
 			}
-			
-			if(fileControlPack == null || fileControlPack.isServer == false){
-				System.out.println("FRCT: Did not receive valid FileControlPacket.");
-				try {
-					messageReceiverSocket.close();
-				} catch (IOException e) {
+
+			if (fileControlPack == null || fileControlPack.isServer == false)
+			{
+				System.out
+						.println("FRCT: Did not receive valid FileControlPacket.");
+				try
+				{
+					fileReceiveControlSocket.close();
+				}
+				catch (IOException e)
+				{
 					System.out.println("FRCT: Unable to close socket.");
 				}
 				continue;
@@ -96,7 +112,7 @@ public class FileReceiveControlThread extends Thread {
 				}
 			}
 			break;
-			//Break and Start FileReceiverThread
+			// Break and Start FileReceiverThread
 		}
 		(new FileReceiverThread(receiveFileName)).start();
 	}

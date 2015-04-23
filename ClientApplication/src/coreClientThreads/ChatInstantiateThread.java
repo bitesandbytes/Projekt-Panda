@@ -1,4 +1,6 @@
-package ClientCore;
+package coreClientThreads;
+
+import clientMain.Client;
 
 public class ChatInstantiateThread extends Thread
 {

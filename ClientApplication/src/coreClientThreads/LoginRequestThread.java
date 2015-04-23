@@ -1,13 +1,13 @@
-package ClientCore;
-
-import helpers.Global;
+package coreClientThreads;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
+import clientMain.Client;
 import common.LoginRequest;
+import coreClient.Global;
 
 public class LoginRequestThread extends Thread
 {
@@ -19,7 +19,7 @@ public class LoginRequestThread extends Thread
 	private ObjectInputStream inStream;
 	private Boolean serverInput;
 
-	LoginRequestThread(LoginRequest u)
+	public LoginRequestThread(LoginRequest u)
 	{
 		super();
 		this.loginObj = u;
@@ -28,22 +28,6 @@ public class LoginRequestThread extends Thread
 	public void run()
 	{
 		System.out.println("Spawned LoginRequestThread");
-		/*
-		 * System.out.println("Sending a socket connection"); clientSocket = new
-		 * Socket(); try { clientSocket.connect(new InetSocketAddress(destIP,
-		 * destPort)); } catch (IOException e) {
-		 * System.out.println("Unable to establish connection with server"); }
-		 * System.out.println("Intializing output Stream"); try { outStream =
-		 * new ObjectOutputStream(clientSocket.getOutputStream()); } catch
-		 * (IOException e) {
-		 * System.out.println("Unable to initialize output Stream"); }
-		 * 
-		 * System.out.println("Writing Object to Server"); try {
-		 * outStream.writeObject(loginObj); outStream.flush(); } catch
-		 * (IOException e) {
-		 * System.out.println("Unable to write to  Output Stream"); }
-		 */
-
 		int retryCount = 3;
 		while (retryCount > 0)
 		{
@@ -90,18 +74,6 @@ public class LoginRequestThread extends Thread
 				return;
 			}
 		}
-		/*
-		 * 
-		 * System.out.println("Object sent. Intializing input Stream"); try {
-		 * inStream = new ObjectInputStream(clientSocket.getInputStream()); }
-		 * catch (IOException e) {
-		 * System.out.println("Unable to initialize input Stream"); }
-		 * System.out.println("Begin to listen."); try { serverInput = (boolean)
-		 * inStream.readObject(); } catch (ClassNotFoundException | IOException
-		 * e) { System.out.println("Unable to read from Server"); }
-		 * System.out.println("Received something from server");
-		 */
-
 		if (serverInput.booleanValue() == true && Client.user.isSignup == true)
 		{
 			System.out.println("Sign Up Successful");
