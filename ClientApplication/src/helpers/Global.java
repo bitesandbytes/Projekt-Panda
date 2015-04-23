@@ -7,7 +7,8 @@ public class Global {
 	public static int serverMsgPort =2500;
 	public static int serverLoginRequestPort = 3500;
 	public static int localMsgReceivePort = 2500;
-	
+	public static int clientFilePort = 4500;
+	public static int fileControlPort = 4400;
 	
 	public static void Log (Object o)
 	{

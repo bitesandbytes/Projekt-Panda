@@ -1,5 +1,7 @@
 package ClientCore;
 
+import helpers.Global;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -10,19 +12,22 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.SocketChannel;
 
-public class FileSenderThread extends Thread {
+public class FileSenderThread extends Thread
+{
 	public static String filePath;
 	private static SocketChannel socketChannel = null;
 	private static String destIP;
-	private final static int fileSendPort = 4500;
-	
-	public FileSenderThread(String f, String dip){
+	private final static int fileSendPort = Global.clientFilePort;
+
+	public FileSenderThread(String f, String dip)
+	{
 		super();
 		filePath = f;
 		destIP = dip;
 	}
-	
-	public void run(){
+
+	public void run()
+	{
 		socketChannel = null;
 		try
 		{
@@ -30,11 +35,14 @@ public class FileSenderThread extends Thread {
 			SocketAddress socketAddress = new InetSocketAddress(destIP,
 					fileSendPort);
 			socketChannel.connect(socketAddress);
-			System.out.println("Connected... Now sending the file");
+			System.out.println("Connected. Sending file | FileSenderThread.");
 
-		} catch (IOException e)
+		}
+		catch (IOException e)
 		{
-			System.out.println("FST: Unable to connect to socket");
+			System.out
+					.println("Remote socket connection failed | FileSenderThread.");
+			return;
 		}
 		RandomAccessFile aFile = null;
 		try
@@ -50,18 +58,23 @@ public class FileSenderThread extends Thread {
 				buffer.clear();
 			}
 			Thread.sleep(1000);
-			System.out.println("FST: File Successfully Sent");
+			System.out.println("File Successfully Sent | FileSenderThread.");
 			socketChannel.close();
 			aFile.close();
-		} catch (FileNotFoundException e)
+			return;
+		}
+		catch (FileNotFoundException e)
 		{
-			System.out.println("FST: Unable to locate File");
-		} catch (IOException e)
+			System.out.println("Unable to locate File | FileSenderThread.");
+		}
+		catch (IOException e)
 		{
-			System.out.println("FST: IOException");
-		} catch (InterruptedException e)
+			System.out.println("IOException | FileSenderThread.");
+
+		}
+		catch (InterruptedException e)
 		{
-			System.out.println("FST: InterruptedException");
+			System.out.println("Thread Sleep Interrupted | FileSenderThread.");
 		}
 	}
 }

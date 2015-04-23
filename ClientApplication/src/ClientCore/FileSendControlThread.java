@@ -1,17 +1,19 @@
 package ClientCore;
 
+import helpers.Global;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.InetSocketAddress;
 import java.net.Socket;
 
 import common.FileControlPacket;
 
-public class FileSendControlThread extends Thread {
+public class FileSendControlThread extends Thread
+{
 	private Socket fileSendControlSocket;
-	private final static String serverIP = "10.42.0.27";
-	private final static int fileControlPort = 4400;
+	private final static String serverIP = Global.serverIP;
+	private final static int fileControlPort = Global.fileControlPort;
 	private ObjectOutputStream outStream;
 	private ObjectInputStream inStream;
 	private String destNick;
@@ -19,59 +21,83 @@ public class FileSendControlThread extends Thread {
 	private String filePath;
 	private String fileName;
 
-	public FileSendControlThread(String dn, String fp) {
+	public FileSendControlThread(String dn, String fp)
+	{
 		super();
 		destNick = dn;
 		filePath = fp;
 	}
 
-	public void run() {
-		String [] temp;
+	public void run()
+	{
+		String[] temp;
 		temp = filePath.split("/");
-		fileName = temp[temp.length-1];
-		try {
-			fileSendControlSocket = new Socket();
-			fileSendControlSocket.connect(new InetSocketAddress(serverIP,
-					fileControlPort));
-		} catch (IOException e1) {
-			System.out.println("FSCT: Could not connect to server.");
-		}
-		System.out.println("FSCT: Intializing output Stream");
-		try {
-			outStream = new ObjectOutputStream(
-					fileSendControlSocket.getOutputStream());
-		} catch (IOException e) {
-			System.out.println("FSCT: Unable to initialize output Stream");
-		}
+		fileName = temp[temp.length - 1];
 		fileControlPack = new FileControlPacket(false, destNick, false);
 		fileControlPack.fileName = fileName;
-		try {
-			outStream.writeObject(fileControlPack);
-			outStream.flush();
-		} catch (IOException e) {
-			System.out.println("FSCT: Unable to write into output stream.");
+		int retryCount = 3;
+		while (retryCount > 0)
+		{
+			try
+			{
+				sendFileControlPacket();
+				break;
+			}
+			catch (IOException ex)
+			{
+				System.out
+						.println("Retrying fileControlPacket send | FileSendControlThread.");
+				retryCount--;
+				continue;
+			}
 		}
-		try {
-			inStream = new ObjectInputStream(
-					fileSendControlSocket.getInputStream());
-		} catch (IOException e) {
-			System.out.println("FSCT: Unable to initialize input Stream");
+		retryCount = 3;
+		while (retryCount > 0)
+		{
+			try
+			{
+				receiveFileControlPacket();
+				break;
+			}
+			catch (IOException ex)
+			{
+				System.out
+						.println("Retrying fileControlPacket receive | FileSendControlThread.");
+				retryCount--;
+				continue;
+			}
+			catch (ClassNotFoundException e)
+			{
+				System.out
+						.println("Invalid packet received | FileSendControlThread.");
+				return;
+			}
 		}
-		try {
-			fileControlPack = (FileControlPacket) inStream.readObject();
-		} catch (ClassNotFoundException | IOException e) {
-			System.out
-					.println("FSCT: Unable to read input as FileControlPacket object");
-		}
-		try {
-			fileSendControlSocket.close();
-		} catch (IOException e) {
-		}
-		if (fileControlPack.isIP == false) {
+		if (fileControlPack.isIP == false)
+		{
 			System.out.println("FSCT: User is offline. Try Again Later");
-		} else {
+		}
+		else
+		{
 			(new FileSenderThread(filePath, fileControlPack.payload)).start();
 
 		}
+	}
+
+	private void receiveFileControlPacket() throws IOException,
+			ClassNotFoundException
+	{
+		inStream = new ObjectInputStream(fileSendControlSocket.getInputStream());
+		fileControlPack = (FileControlPacket) inStream.readObject();
+		fileSendControlSocket.close();
+	}
+
+	private void sendFileControlPacket() throws IOException
+	{
+		fileSendControlSocket = new Socket(serverIP, fileControlPort);
+		outStream = new ObjectOutputStream(
+				fileSendControlSocket.getOutputStream());
+		outStream.writeObject(fileControlPack);
+		outStream.flush();
 	}
 }
