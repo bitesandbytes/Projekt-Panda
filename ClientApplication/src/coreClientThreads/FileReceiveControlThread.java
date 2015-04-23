@@ -98,6 +98,7 @@ public class FileReceiveControlThread extends Thread
 				continue;
 			receiveFileName = controlPacket.fileName;
 			(new FileReceiverThread(receiveFileName)).start();
+			break;
 		}
 	}
 }

@@ -76,7 +76,7 @@ public class FileSendControlThread extends Thread
 			}
 		}
 		
-		if (fileControlPack.isIP == false)
+		if (fileControlPack.isIP == true && fileControlPack.payload.equals("0.0.0.0"))
 		{
 			System.out.println("FSCT: User is offline. Try Again Later");
 		}

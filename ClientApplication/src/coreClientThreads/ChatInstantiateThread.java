@@ -12,5 +12,6 @@ public class ChatInstantiateThread extends Thread
 			System.out.println((i + 1) + ". " + Client.friends.get(i));
 		(new ChatSendThread()).start();
 		(new ChatReceiveThread()).start();
+		(new FileReceiveControlThread()).start();
 	}
 }
