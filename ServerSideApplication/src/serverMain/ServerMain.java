@@ -3,6 +3,7 @@ package serverMain;
 import coreServer.RequestQueue;
 import coreServer.UserMap;
 import coreServerThreads.ControlThread;
+import coreServerThreads.FileRequestListenerThread;
 import coreServerThreads.MessageReceiverThread;
 import coreServerThreads.RequestProcessorThread;
 
@@ -18,8 +19,10 @@ public class ServerMain
 				queue);
 		RequestProcessorThread messageSender = new RequestProcessorThread(
 				queue, userMap);
+		FileRequestListenerThread fileRequests = new FileRequestListenerThread(userMap);
 		controlThread.start();
 		messageReciever.start();
 		messageSender.start();
+		fileRequests.start();
 	}
 }
