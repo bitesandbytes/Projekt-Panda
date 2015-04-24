@@ -3,7 +3,7 @@ package coreClient;
 public class Global
 {
 	public static String serverIP = "10.42.0.27";
-	public static String defaultFileSavePath = "/home/sauce/Documents";
+	public static String defaultFileSavePath = "/home/sauce/Documents/";
 	public static int serverFileRequestPort = 4400;
 	public static int serverMsgPort = 2400;
 	public static int serverLoginRequestPort = 3400;
