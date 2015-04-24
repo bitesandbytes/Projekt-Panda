@@ -52,7 +52,7 @@ public class FileSenderThread extends Thread
 		{
 			ObjectOutputStream oos = new ObjectOutputStream(socketChannel
 					.socket().getOutputStream());
-			oos.writeUTF(filename);
+			oos.writeObject(filename);
 		}
 		catch (IOException e1)
 		{

@@ -49,7 +49,7 @@ public class NewFileReceiveThread extends Thread
 				filename = getFilename(socketChannel);
 				readFromSocket(socketChannel, filename);
 			}
-			catch (IOException e)
+			catch (IOException | ClassNotFoundException e)
 			{
 				System.out
 						.println("Dropped a file transfer. Request transfer again.");
@@ -58,13 +58,13 @@ public class NewFileReceiveThread extends Thread
 		}
 	}
 
-	private String getFilename(SocketChannel socketChannel) throws IOException
+	private String getFilename(SocketChannel socketChannel) throws IOException, ClassNotFoundException
 	{
 		System.out.println("Reading filename | NewFileReceiveThread.");
 		ObjectInputStream ois = new ObjectInputStream(socketChannel.socket()
 				.getInputStream());
 		System.out.println("Got OIS | NewFileReceiveThread.");
-		String filename = ois.readUTF();
+		String filename = (String) ois.readObject();
 		System.out.println("ReadUTF done | NewFileReceiveThread.");
 		System.out.println("Reading filename | NewFileReceiveThread.");
 		return filename;
@@ -73,7 +73,7 @@ public class NewFileReceiveThread extends Thread
 	private void readFromSocket(SocketChannel socketChannel, String filename)
 			throws IOException
 	{
-		System.out.println("Receiving file | NewFileReceiveThread.");
+		System.out.println("Receiving file "+filename+" | NewFileReceiveThread.");
 		RandomAccessFile file = null;
 		file = new RandomAccessFile(destFolder + filename, "rw");
 		ByteBuffer buffer = ByteBuffer.allocate(1024);
