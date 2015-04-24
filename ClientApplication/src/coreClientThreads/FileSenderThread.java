@@ -6,13 +6,11 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.RandomAccessFile;
 import java.net.InetSocketAddress;
-import java.net.Socket;
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.SocketChannel;
 
-import common.FileControlPacket;
 import coreClient.Global;
 
 public class FileSenderThread extends Thread
@@ -33,11 +31,6 @@ public class FileSenderThread extends Thread
 
 	public void run()
 	{
-		if (!sendFilename())
-		{
-			System.out.println("Unable to establish connection. Try again.");
-			return;
-		}
 		socketChannel = null;
 		try
 		{
@@ -45,13 +38,25 @@ public class FileSenderThread extends Thread
 			SocketAddress socketAddress = new InetSocketAddress(destIP,
 					fileSendPort);
 			socketChannel.connect(socketAddress);
-			System.out.println("Connected. Sending file | FileSenderThread.");
+			System.out
+					.println("Connected. Sending filename | FileSenderThread.");
 
 		}
 		catch (IOException e)
 		{
 			System.out
 					.println("Remote socket connection failed | FileSenderThread.");
+			return;
+		}
+		try
+		{
+			ObjectOutputStream oos = new ObjectOutputStream(socketChannel
+					.socket().getOutputStream());
+			oos.writeUTF(filename);
+		}
+		catch (IOException e1)
+		{
+			System.out.println("Unable to write filename. Try again. ");
 			return;
 		}
 		RandomAccessFile aFile = null;
@@ -86,38 +91,5 @@ public class FileSenderThread extends Thread
 		{
 			System.out.println("Thread Sleep Interrupted | FileSenderThread.");
 		}
-	}
-
-	private boolean sendFilename()
-	{
-		int retryCount = 3;
-		while (retryCount > 0)
-		{
-			try
-			{
-				Socket otherClient = new Socket(destIP, fileSendPort);
-				System.out.println("Got client socket | FileSenderThread");
-				ObjectOutputStream oos = new ObjectOutputStream(
-						otherClient.getOutputStream());
-				System.out.println("Got OOS | FileSenderThread");
-				FileControlPacket sendPacket = new FileControlPacket(false,
-						null, false);
-				sendPacket.fileName = filename;
-				oos.writeObject(sendPacket);
-				System.out.println("Wrote sendPacket | FileSenderThread");
-				otherClient.close();
-				System.out.println("Closing client socket | FileSenderThread");
-				break;
-			}
-			catch (IOException ioEx)
-			{
-				retryCount--;
-				if (retryCount == 0)
-					return false;
-				else
-					continue;
-			}
-		}
-		return true;
 	}
 }

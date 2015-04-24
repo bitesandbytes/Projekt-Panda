@@ -83,7 +83,7 @@ public class FileSendControlThread extends Thread
 		else
 		{	
 			System.out.println("FSCT: Setting up connection directly to client");
-			(new FileSenderThread(filePath,fileName, fileControlPack.payload)).start();
+			(new FileSenderThread(filePath,fileName,fileControlPack.payload)).start();
 
 		}
 	}

@@ -4,14 +4,10 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.RandomAccessFile;
 import java.net.InetSocketAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
-
-import common.FileControlPacket;
 
 import coreClient.Global;
 
@@ -19,66 +15,65 @@ public class NewFileReceiveThread extends Thread
 {
 	private static int listenPort = Global.clientFilePort;
 	private static String destFolder = Global.defaultFileSavePath;
+
 	public NewFileReceiveThread()
 	{
 		super();
 	}
-	
+
 	public void run()
 	{
 		String filename = null;
-		while(true)
+		ServerSocketChannel serverSocketChannel = null;
+		SocketChannel socketChannel = null;
+		System.out.println("Opening serverSocketChannel | NewReceiverThread");
+		try
+		{
+			serverSocketChannel = ServerSocketChannel.open();
+			serverSocketChannel.socket()
+					.bind(new InetSocketAddress(listenPort));
+		}
+		catch (IOException e1)
+		{
+			System.out.println("Unable to bind | NewReceiverThread.");
+			return;
+		}
+
+		System.out
+				.println("severSocketChannel Bind successful | NewReceiverThread");
+		while (true)
 		{
 			try
 			{
-				filename = getFilename();
-				readFromSocket(getNewServerSocketChannel(), filename);
+				socketChannel = serverSocketChannel.accept();
+				filename = getFilename(socketChannel);
+				readFromSocket(socketChannel, filename);
 			}
-			catch (ClassNotFoundException | IOException e)
+			catch (IOException e)
 			{
-				System.out.println("Dropped a file transfer. Request transfer again.");
+				System.out
+						.println("Dropped a file transfer. Request transfer again.");
 				continue;
 			}
 		}
 	}
-	
-	
-	private String getFilename() throws IOException, ClassNotFoundException
+
+	private String getFilename(SocketChannel socketChannel) throws IOException
 	{
-		ServerSocket controlServer = new ServerSocket(listenPort);
-		System.out.println("Got controlServerSocket | NewReceiverThread");
-		Socket clientSocket = controlServer.accept();
-		System.out.println("Got clientSocket | NewReceiverThread");
-		ObjectInputStream ois = new ObjectInputStream(clientSocket.getInputStream());
-		System.out.println("Got OOS | NewReceiverThread");
-		FileControlPacket rcvPacket = (FileControlPacket) ois.readObject();
-		System.out.println("Received controlPacket | NewReceiverThread");
-		clientSocket.close();
-		System.out.println("Closed connection | NewReceiverThread");
-		controlServer.setReuseAddress(true);
-		System.out.println("Enabling reuse | NewReceiverThread");
-		controlServer.close();
-		System.out.println("Got filename | NewReceiverThread");
-		return rcvPacket.fileName;
+		System.out.println("Reading filename | NewFileReceiveThread.");
+		ObjectInputStream ois = new ObjectInputStream(socketChannel.socket()
+				.getInputStream());
+		System.out.println("Got OIS | NewFileReceiveThread.");
+		String filename = ois.readUTF();
+		System.out.println("ReadUTF done | NewFileReceiveThread.");
+		System.out.println("Reading filename | NewFileReceiveThread.");
+		return filename;
 	}
-	
-	private SocketChannel getNewServerSocketChannel() throws IOException
+
+	private void readFromSocket(SocketChannel socketChannel, String filename)
+			throws IOException
 	{
-		ServerSocketChannel serverSocketChannel = null;
-		SocketChannel socketChannel = null;
-		serverSocketChannel = ServerSocketChannel.open();
-		System.out.println("Opening serverSocketChannel | NewReceiverThread");
-		serverSocketChannel.socket().bind(new InetSocketAddress(listenPort));
-		System.out.println("severSocketChannel Bind successful | NewReceiverThread");
-		socketChannel = serverSocketChannel.accept();
-		System.out.println("Receiving file from "
-				+ socketChannel.getRemoteAddress());
-		serverSocketChannel.close();
-		System.out.println("serverSocketChannel closed | NewReceiverThread");
-		return socketChannel;
-	}
-	private void readFromSocket(SocketChannel socketChannel, String filename) throws IOException
-	{
+		System.out.println("Receiving file | NewFileReceiveThread.");
 		RandomAccessFile file = null;
 		file = new RandomAccessFile(destFolder + filename, "rw");
 		ByteBuffer buffer = ByteBuffer.allocate(1024);
@@ -89,6 +84,7 @@ public class NewFileReceiveThread extends Thread
 			fileChannel.write(buffer);
 			buffer.clear();
 		}
+		System.out.println("File receive complete| NewFileReceiveThread.");
 		fileChannel.close();
 		socketChannel.close();
 		file.close();

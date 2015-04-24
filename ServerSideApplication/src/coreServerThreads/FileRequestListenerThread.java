@@ -10,12 +10,12 @@ public class FileRequestListenerThread extends Thread
 	private static int fileRequestListenPort = 4400;
 	private UserMap userMap;
 	private ServerSocket serverSocket;
-	
+
 	public FileRequestListenerThread(UserMap userMap)
 	{
 		this.userMap = userMap;
 	}
-	
+
 	public void run()
 	{
 		System.out.println("Starting file request listener thread.");
@@ -25,16 +25,21 @@ public class FileRequestListenerThread extends Thread
 		}
 		catch (IOException e1)
 		{
-			System.out.println("Unable to bind to 4400. Terminate any servers binding to that port.");
+			System.out
+					.println("Unable to bind to 4400. Terminate any servers binding to that port.");
 			return;
 		}
 		System.out.println("Got file server socket.");
-		while(true)
+		while (true)
 		{
 			try
 			{
-				(new FileRequestHandlerThread(userMap, serverSocket.accept())).start();
-				System.out.println("Got new file request. | FileRequestListenerThread");
+				// (new FileRequestHandlerThread(userMap,
+				// serverSocket.accept())).start();
+				(new SimplerFileRequestHandlerThread(userMap,
+						serverSocket.accept())).start();
+				System.out
+						.println("Got new file request. | FileRequestListenerThread");
 			}
 			catch (IOException e)
 			{

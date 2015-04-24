@@ -17,5 +17,4 @@ public class Global
 			System.out.println(o);
 		}
 	}
-
 }

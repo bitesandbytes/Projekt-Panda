@@ -48,7 +48,7 @@ public class FileRequestHandlerThread extends Thread
 					.println("Unable to get OIS for src socket. Dropping request.");
 			return;
 		}
-		System.out.println("Got srcOOS | FileRequestHandlerThread");
+		System.out.println("Got srcOIS | FileRequestHandlerThread");
 		while (retryCount > 0)
 		{
 			try
