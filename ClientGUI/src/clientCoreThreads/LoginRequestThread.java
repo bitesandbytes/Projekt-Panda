@@ -67,6 +67,8 @@ public class LoginRequestThread extends Thread
 		if (serverInput.booleanValue() == true)
 		{
 			System.out.println("Login Successful");
+			loginWindow.setVisible(false);
+			loginWindow.dispose();
 			// TODO:: Start chat GUI thread.
 			return;
 		}

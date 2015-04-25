@@ -31,7 +31,7 @@ public class ServerStatusThread extends Thread
 		{
 			try
 			{
-				pingResult = InetAddress.getByName(serverIP).isReachable(10);
+				pingResult = InetAddress.getByName(serverIP).isReachable(Global.pingTimeout);
 				if (pingResult)
 				{
 					serverStatus.setForeground(Color.green);
@@ -46,7 +46,7 @@ public class ServerStatusThread extends Thread
 					login.setEnabled(false);
 					register.setEnabled(false);
 				}
-				Thread.sleep(500);
+				Thread.sleep(1000);
 			}
 			catch (IOException e)
 			{

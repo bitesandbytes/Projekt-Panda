@@ -70,6 +70,8 @@ public class RegisterRequestThread extends Thread
 			System.out.println("Sign Up Successful");
 			JOptionPane.showMessageDialog(loginWindow, "Register successful.");
 			// TODO:: Start chat GUI thread.
+			loginWindow.setVisible(false);
+			loginWindow.dispose();
 			return;
 		}
 		else
