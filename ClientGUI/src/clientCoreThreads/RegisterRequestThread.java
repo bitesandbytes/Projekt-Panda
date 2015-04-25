@@ -8,8 +8,8 @@ import java.net.Socket;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
+import GUI.ChatWindow;
 import common.LoginRequest;
-
 import coreClient.Global;
 
 public class RegisterRequestThread extends Thread
@@ -72,6 +72,8 @@ public class RegisterRequestThread extends Thread
 			JOptionPane.showMessageDialog(loginWindow, "Register successful.");
 			loginWindow.setVisible(false);
 			loginWindow.dispose();
+			Global.myNick = loginObj.nick;
+			ChatWindow chatWindow = new ChatWindow();
 			return;
 		}
 		else

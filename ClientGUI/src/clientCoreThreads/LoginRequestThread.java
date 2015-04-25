@@ -8,8 +8,8 @@ import java.net.Socket;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
+import GUI.ChatWindow;
 import common.LoginRequest;
-
 import coreClient.Global;
 
 public class LoginRequestThread extends Thread
@@ -70,7 +70,8 @@ public class LoginRequestThread extends Thread
 			System.out.println("Login Successful");
 			loginWindow.setVisible(false);
 			loginWindow.dispose();
-			//TODO:: start chat GUI thread.
+			Global.myNick = loginObj.nick;
+			ChatWindow chat = new ChatWindow();
 			return;
 		}
 		else

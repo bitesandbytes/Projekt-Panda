@@ -2,18 +2,8 @@ package GUI;
 
 import java.awt.EventQueue;
 import java.awt.Font;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
+import java.awt.event.*;
+import java.io.*;
 import java.util.Scanner;
 
 import javax.swing.DefaultListModel;
@@ -29,20 +19,23 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 
+import clientCoreThreads.ChatReceiveThread;
+import clientCoreThreads.FileSendControlThread;
+import clientCoreThreads.NewFileReceiveThread;
 import common.Message;
 import coreClient.Global;
 import coreClient.MessageQueue;
-import clientCoreThreads.ChatReceiveThread;
-import clientCoreThreads.WriteUserInputThread;
 
 public class ChatWindow
 {
 
 	private JFrame frmChatServerV;
 	private JTextField addNewUser;
+	private String filePath;
 	private JFileChooser fileChooser;
-	private WriteUserInputThread msgWriter;
+	@SuppressWarnings({ "rawtypes" })
 	DefaultListModel listModel;
+	@SuppressWarnings("rawtypes")
 	JList UserList;
 	private JTextArea currentSendMessageBox;
 	private JTextArea currentChatBox;
@@ -59,7 +52,7 @@ public class ChatWindow
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String[] args)
+	public void start(String[] args)
 	{
 		try
 		{
@@ -95,11 +88,13 @@ public class ChatWindow
 	public ChatWindow()
 	{
 		initialize();
+		start(null);
 	}
 
 	/*
 	 * Initialize the contents of the frame.
 	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private void initialize()
 	{
 		fileChooser = new JFileChooser();
@@ -233,10 +228,12 @@ public class ChatWindow
 					currentChatBox.append("\n" + "You: ");
 					currentChatBox.append(msg);
 				}
-				msgWriter.setFriend(curFriend.getText());
-				// TODO :: Invoke file sender thread.
-				filename.setText("No file chosen.");
-				fileSize.setText("0 Bytes");
+				String filepath = filePath;
+				String dest = curFriend.getText();
+				JTextArea msgBox = currentChatBox;
+				JButton sendButton = fileTransfer;
+				(new FileSendControlThread(dest, filepath, msgBox, sendButton))
+						.start();
 			}
 		});
 		frmChatServerV.getContentPane().add(btnSendMessage);
@@ -252,6 +249,7 @@ public class ChatWindow
 				{
 					File curFile = fileChooser.getSelectedFile();
 					filename.setText(curFile.getName());
+					filePath = curFile.getAbsolutePath();
 					long size = curFile.length();
 					if (size > 1000000)
 					{
@@ -331,7 +329,6 @@ public class ChatWindow
 						currentSendMessageBox.append("\n" + "File : "
 								+ filename.getText() + ", Size : "
 								+ fileSize.getText() + ".");
-
 					}
 
 				}
@@ -339,8 +336,6 @@ public class ChatWindow
 			}
 		});
 		scrollPane.setViewportView(currentSendMessageBox);
-		msgWriter = new WriteUserInputThread(currentSendMessageBox);
-		msgWriter.start();
 
 		JScrollPane scrollPane_1 = new JScrollPane();
 		scrollPane_1.setBounds(164, 41, 370, 236);
@@ -361,6 +356,7 @@ public class ChatWindow
 		fileSize.setFont(new Font("Liberation Sans", Font.PLAIN, 13));
 		fileSize.setBounds(439, 390, 80, 17);
 		frmChatServerV.getContentPane().add(fileSize);
+		(new NewFileReceiveThread()).start();
 	}
 
 	public void enableFileTransfer()

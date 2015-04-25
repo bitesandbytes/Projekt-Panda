@@ -21,11 +21,12 @@ public class ChatReceiveThread extends Thread
 	public JTextArea chatBox;
 	public JLabel curFriendLabel = Global.currentFriendLabel;
 	PrintWriter writer;
-	
-	public ChatReceiveThread(JTextArea chatBox){
+
+	public ChatReceiveThread(JTextArea chatBox)
+	{
 		super();
 		this.chatBox = chatBox;
-		
+
 	}
 
 	public void run()
@@ -47,10 +48,15 @@ public class ChatReceiveThread extends Thread
 			try
 			{
 				currentMessage = getMessage(msgServer.accept());
-				if (currentMessage != null){
-					//Global.Log(currentMessage.sourceNick + ": "+ currentMessage.content);
-					if(curFriendLabel.getText().equals(currentMessage.sourceNick)){
-						writer = new PrintWriter(Global.userContainerPath+currentMessage.sourceNick, "UTF-8");
+				if (currentMessage != null)
+				{
+					// Global.Log(currentMessage.sourceNick + ": "+
+					// currentMessage.content);
+					if (curFriendLabel.getText().equals(
+							currentMessage.sourceNick))
+					{
+						writer = new PrintWriter(Global.userContainerPath
+								+ currentMessage.sourceNick, "UTF-8");
 						writer.print(currentMessage.content);
 						writer.close();
 						synchronized (chatBox)
