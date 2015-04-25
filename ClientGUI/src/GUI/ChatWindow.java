@@ -61,7 +61,7 @@ public class ChatWindow
 	/**
 	 * Launch the application.
 	 */
-	public void start(String[] args)
+	public void main(String[] args)
 	{
 		try
 		{
@@ -97,7 +97,7 @@ public class ChatWindow
 	public ChatWindow()
 	{
 		initialize();
-		start(null);
+		//start(null);
 	}
 
 	/*
