@@ -1,14 +1,13 @@
 package GUI;
 
-import java.awt.EventQueue;
-
 import javax.swing.JFrame;
-import javax.swing.UIManager;
 import javax.swing.JLabel;
 import java.awt.Font;
 import javax.swing.SwingConstants;
 import javax.swing.JTextField;
 import javax.swing.JButton;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class NewChat
 {
@@ -17,40 +16,6 @@ public class NewChat
 	private JTextField textField;
 	private JLabel lblStartingANew;
 
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args)
-	{
-		try
-		{
-			UIManager
-					.setLookAndFeel("com.jtattoo.plaf.graphite.GraphiteLookAndFeel");
-		}
-		catch (Throwable e)
-		{
-			e.printStackTrace();
-		}
-		EventQueue.invokeLater(new Runnable()
-		{
-			public void run()
-			{
-				try
-				{
-					NewChat window = new NewChat();
-					window.frmStartANew.setVisible(true);
-				}
-				catch (Exception e)
-				{
-					e.printStackTrace();
-				}
-			}
-		});
-	}
-
-	/**
-	 * Create the application.
-	 */
 	public NewChat()
 	{
 		initialize();
@@ -86,6 +51,10 @@ public class NewChat
 		frmStartANew.getContentPane().add(lblStartingANew);
 
 		JButton btnNewButton = new JButton("Start");
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
 		btnNewButton.setBounds(12, 96, 183, 34);
 		frmStartANew.getContentPane().add(btnNewButton);
 	}
