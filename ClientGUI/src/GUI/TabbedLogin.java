@@ -216,7 +216,6 @@ public class TabbedLogin
 	{
 		String nick = nickLogin.getText();
 		String password = new String(passwordLogin.getPassword());
-		System.out.println("user : " + nick + ", pass : " + password);
 		(new LoginRequestThread(new LoginRequest(nick, password),
 				frmChatServerV)).start();
 	}
@@ -225,7 +224,6 @@ public class TabbedLogin
 	{
 		String nick = nickLogin.getText();
 		String password = new String(passwordLogin.getPassword());
-		System.out.println("user : " + nick + ", pass : " + password);
 		(new RegisterRequestThread(new LoginRequest(nick, password),
 				frmChatServerV)).start();
 	}
