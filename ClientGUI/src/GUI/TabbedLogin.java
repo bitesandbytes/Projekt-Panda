@@ -222,8 +222,8 @@ public class TabbedLogin
 
 	protected void register()
 	{
-		String nick = nickLogin.getText();
-		String password = new String(passwordLogin.getPassword());
+		String nick = nickRegister.getText();
+		String password = new String(passwordRegister.getPassword());
 		(new RegisterRequestThread(new LoginRequest(nick, password),
 				frmChatServerV)).start();
 	}

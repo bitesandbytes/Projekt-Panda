@@ -69,6 +69,9 @@ public class RequestProcessorThread extends Thread
 				.getPendingMessageQueueFor(currentRequest.msgContent.destNick);
 		destIP = userMap.getCurrentIP(currentRequest.msgContent.destNick);
 
+		if (!userMap.isNickUsed(currentRequest.msgContent.destNick))
+			return;
+
 		System.out.println("Got destIP and pending queue.");
 		if (pendingQueue == null)
 		{

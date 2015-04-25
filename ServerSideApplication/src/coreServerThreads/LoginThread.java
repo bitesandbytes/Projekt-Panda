@@ -47,7 +47,7 @@ public class LoginThread extends Thread
 		}
 		System.out.println("Got obj.");
 		Boolean sendObj = false;
-		
+		System.out.println("Credentials: "+loginReq.nick+", "+loginReq.pass+" : "+loginReq.isSignup);
 		if (loginReq.isSignup)
 		{
 			sendObj = userMap.addUser(loginReq, remoteSocket.getInetAddress()
