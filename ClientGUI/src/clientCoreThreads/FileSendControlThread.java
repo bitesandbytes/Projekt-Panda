@@ -5,6 +5,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
+import javax.swing.JButton;
 import javax.swing.JTextArea;
 
 import common.FileControlPacket;
@@ -22,13 +23,16 @@ public class FileSendControlThread extends Thread
 	private String filePath;
 	private String fileName;
 	private JTextArea msgBox;
+	private JButton fileButton;
 
-	public FileSendControlThread(String dn, String fp, JTextArea msgBox)
+	public FileSendControlThread(String dn, String fp, JTextArea msgBox,
+			JButton fileButton)
 	{
 		super();
 		this.destNick = dn;
 		this.filePath = fp;
 		this.msgBox = msgBox;
+		this.fileButton = fileButton;
 	}
 
 	public void run()
@@ -89,7 +93,7 @@ public class FileSendControlThread extends Thread
 		{
 			Global.Log("FSCT: Setting up connection directly to client");
 			(new FileSenderThread(filePath, fileName, fileControlPack.payload,
-					msgBox)).start();
+					msgBox, fileButton)).start();
 		}
 	}
 

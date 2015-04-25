@@ -11,6 +11,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.SocketChannel;
 
+import javax.swing.JButton;
 import javax.swing.JTextArea;
 
 import coreClient.Global;
@@ -23,20 +24,23 @@ public class FileSenderThread extends Thread
 	private String destIP;
 	private final int fileSendPort = Global.clientFilePort;
 	private JTextArea msgBox;
+	private JButton fileButton;
 
 	public FileSenderThread(String path, String name, String dip,
-			JTextArea msgBox)
+			JTextArea msgBox, JButton fileButton)
 	{
 		super();
 		this.filePath = path;
 		this.filename = name;
 		this.destIP = dip;
 		this.msgBox = msgBox;
+		this.fileButton = fileButton;
 	}
 
 	@SuppressWarnings("resource")
 	public void run()
 	{
+		fileButton.setEnabled(false);
 		socketChannel = null;
 		try
 		{
@@ -82,6 +86,7 @@ public class FileSenderThread extends Thread
 			Global.Log("File Successfully Sent | FileSenderThread.");
 			socketChannel.close();
 			aFile.close();
+			fileButton.setEnabled(true);
 			return;
 		}
 		catch (FileNotFoundException e)
@@ -110,5 +115,6 @@ public class FileSenderThread extends Thread
 		{
 			msgBox.append("\n" + filename + " transfer failed. Try again.");
 		}
+		fileButton.setEnabled(true);
 	}
 }

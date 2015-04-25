@@ -51,7 +51,7 @@ public class ChatWindow
 	File curFriendFile;
 	PrintWriter writer;
 	private String userContainerPath = Global.userContainerPath;
-	JLabel curFriend =  Global.currentFriendLabel;
+	JLabel curFriend = Global.currentFriendLabel;
 	private Message curMessage;
 	public MessageQueue messageQueue = Global.msgQueue;
 	private JButton fileTransfer;
@@ -133,14 +133,21 @@ public class ChatWindow
 						Object o = theList.getModel().getElementAt(index);
 						System.out.println("Double-clicked on: '"
 								+ o.toString() + "'");
-						
+
 						curFriend.setText(o.toString());
-						System.out.println(userContainerPath + curFriend.getText());
+						System.out.println(userContainerPath
+								+ curFriend.getText());
 						String content = null;
-						try {
-							content = new Scanner(new File(userContainerPath + curFriend.getText())).useDelimiter("\\Z").next();
-						} catch (FileNotFoundException e) {
-							Global.Log("Can't Open File of: "+curFriend.getText());
+						try
+						{
+							content = new Scanner(new File(userContainerPath
+									+ curFriend.getText())).useDelimiter("\\Z")
+									.next();
+						}
+						catch (FileNotFoundException e)
+						{
+							Global.Log("Can't Open File of: "
+									+ curFriend.getText());
 						}
 						currentSendMessageBox.setEditable(true);
 						currentChatBox.setText(null);
@@ -175,8 +182,10 @@ public class ChatWindow
 						listModel.addElement(newUser);
 
 						curFriendFile = new File(userContainerPath + newUser);
-						try {
-							if (curFriendFile.createNewFile()) {
+						try
+						{
+							if (curFriendFile.createNewFile())
+							{
 								Global.Log("File is created!");
 							}
 							else
@@ -201,16 +210,20 @@ public class ChatWindow
 
 		JButton btnSendMessage = new JButton("Send");
 		btnSendMessage.setBounds(467, 307, 67, 45);
-		btnSendMessage.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if (!fileSize.getText().equals("0 Bytes")) {
+		btnSendMessage.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				if (!fileSize.getText().equals("0 Bytes"))
+				{
 					currentSendMessageBox.append("\n" + "File : "
 
-							+ filename.getText() + ", Size : "
-							+ fileSize.getText() + ".");
+					+ filename.getText() + ", Size : " + fileSize.getText()
+							+ ".");
 				}
 				String msg;
-				synchronized (currentSendMessageBox) {
+				synchronized (currentSendMessageBox)
+				{
 					msg = currentSendMessageBox.getText();
 					currentSendMessageBox.notify();
 
@@ -272,38 +285,49 @@ public class ChatWindow
 		scrollPane.setBounds(164, 289, 290, 85);
 		frmChatServerV.getContentPane().add(scrollPane);
 
-
 		currentSendMessageBox = new JTextArea();
 		currentSendMessageBox.setEditable(false);
-		currentSendMessageBox.addKeyListener(new KeyAdapter() {
+		currentSendMessageBox.addKeyListener(new KeyAdapter()
+		{
 			@Override
-			public void keyPressed(KeyEvent e) {
-				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+			public void keyPressed(KeyEvent e)
+			{
+				if (e.getKeyCode() == KeyEvent.VK_ENTER)
+				{
 					String curText = currentSendMessageBox.getText();
 					System.out.println("ENTER pressed. Value Entered: "
 							+ curText);
 					addNewUser.setText(null);
-					if (curText.equals("") == false){
+					if (curText.equals("") == false)
+					{
 						currentChatBox.append(curText);
-						curMessage = new Message("1", curFriend.getText(), curText);
-						//curMessage.content = ;
-						//curMessage.destNick = ;
+						curMessage = new Message("1", curFriend.getText(),
+								curText);
+						// curMessage.content = ;
+						// curMessage.destNick = ;
 						synchronized (messageQueue)
 						{
 							messageQueue.addMessage(curMessage);
 							messageQueue.notify();
 						}
-						try {
-							writer = new PrintWriter(userContainerPath+curFriend.getText(), "UTF-8");
-						} catch (FileNotFoundException e1) {
+						try
+						{
+							writer = new PrintWriter(userContainerPath
+									+ curFriend.getText(), "UTF-8");
+						}
+						catch (FileNotFoundException e1)
+						{
 							System.out.println("Unable To Find File");
-						} catch (UnsupportedEncodingException e1) {
+						}
+						catch (UnsupportedEncodingException e1)
+						{
 							System.out.println("Stop Using UTF-8");
 						}
 						writer.print(curText);
 						writer.close();
 					}
-					if(!fileSize.getText().equals("0 Bytes")){
+					if (!fileSize.getText().equals("0 Bytes"))
+					{
 						currentSendMessageBox.append("\n" + "File : "
 								+ filename.getText() + ", Size : "
 								+ fileSize.getText() + ".");
