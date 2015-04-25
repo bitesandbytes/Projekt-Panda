@@ -11,19 +11,11 @@ import coreServer.UserMap;
 
 public class SimplerFileRequestHandlerThread extends Thread
 {
-	private static int destPort = 4500;
-
 	private UserMap userMap;
 
 	private Socket srcSocket;
-	private Socket destSocket;
-
 	private ObjectInputStream srcOIS;
-	private ObjectInputStream destOIS;
-
 	private ObjectOutputStream srcOOS;
-	private ObjectOutputStream destOOS;
-
 	private FileControlPacket controlPacket;
 
 	private int retryCount = 3;
@@ -141,26 +133,5 @@ public class SimplerFileRequestHandlerThread extends Thread
 		}
 		return;
 
-	}
-
-	// Writes "controlPacket" to destSocket and returns the received packet.
-	private FileControlPacket contactDestClient() throws Exception
-	{
-		System.out.println("Contacting destClient.");
-		destSocket = new Socket(destIP, destPort);
-		System.out.println("Got destSocket | FileRequestHandlerThread");
-		destOOS = new ObjectOutputStream(destSocket.getOutputStream());
-		System.out.println("Got destOOS | FileRequestHandlerThread");
-		destOOS.writeObject(controlPacket);
-		System.out
-				.println("Wrote controlPacket to destNick | FileRequestHandlerThread");
-		destOIS = new ObjectInputStream(destSocket.getInputStream());
-		System.out.println("Got destOIS | FileRequestHandlerThread");
-		FileControlPacket receivedPacket = (FileControlPacket) destOIS
-				.readObject();
-		destSocket.close();
-		System.out
-				.println("Received controlPacket from dest | FileRequestHandlerThread");
-		return receivedPacket;
 	}
 }

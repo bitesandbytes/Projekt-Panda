@@ -3,5 +3,7 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="src/JTattoo-1.6.11.jar"/>
+	<classpathentry kind="lib" path="src/laffy-seaglass.jar"/>
+	<classpathentry kind="lib" path="swingx-1.6.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
