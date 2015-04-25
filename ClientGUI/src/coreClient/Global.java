@@ -2,6 +2,8 @@ package coreClient;
 
 public class Global
 {
+	public static String myNick = "sauce";
+	public static MessageQueue msgQueue = new MessageQueue();
 	public static String serverIP = "localhost";
 	public static String defaultFileSavePath = "/home/sauce/Documents/";
 	public static int serverFileRequestPort = 4400;

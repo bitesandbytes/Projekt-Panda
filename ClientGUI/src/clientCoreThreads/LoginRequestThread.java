@@ -9,6 +9,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import common.LoginRequest;
+
 import coreClient.Global;
 
 public class LoginRequestThread extends Thread
@@ -69,7 +70,7 @@ public class LoginRequestThread extends Thread
 			System.out.println("Login Successful");
 			loginWindow.setVisible(false);
 			loginWindow.dispose();
-			// TODO:: Start chat GUI thread.
+			//TODO:: start chat GUI thread.
 			return;
 		}
 		else
