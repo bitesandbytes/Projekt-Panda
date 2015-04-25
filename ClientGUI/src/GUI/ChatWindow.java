@@ -9,6 +9,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.io.IOException;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -23,10 +24,12 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 
+import common.Message;
+import coreClient.Global;
+import coreClient.MessageQueue;
 import clientCoreThreads.WriteUserInputThread;
 
-public class ChatWindow
-{
+public class ChatWindow {
 
 	private JFrame frmChatServerV;
 	private JTextField addNewUser;
@@ -38,34 +41,33 @@ public class ChatWindow
 	private JTextArea currentChatBox;
 	private JLabel filename;
 	private JLabel fileSize;
+	File newUserFile;
+	private String userContainerPath = Global.userContainerPath;
+	
+	
+	JLabel curFriend =  Global.currentFriend;
+	private Message curMessage;
+	public MessageQueue messageQueue = Global.msgQueue;
+	
 
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String[] args)
-	{
-		try
-		{
+	public static void main(String[] args) {
+		try {
 			UIManager
 					.setLookAndFeel("com.jtattoo.plaf.graphite.GraphiteLookAndFeel");
-		}
-		catch (Throwable e)
-		{
+		} catch (Throwable e) {
 			e.printStackTrace();
 		}
-		EventQueue.invokeLater(new Runnable()
-		{
-			public void run()
-			{
-				try
-				{
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
 					ChatWindow window = new ChatWindow();
 					window.frmChatServerV.setVisible(true);
 					window.frmChatServerV.setResizable(false);
 					window.frmChatServerV.setLocationRelativeTo(null);
-				}
-				catch (Exception e)
-				{
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
@@ -75,16 +77,14 @@ public class ChatWindow
 	/**
 	 * Create the application.
 	 */
-	public ChatWindow()
-	{
+	public ChatWindow() {
 		initialize();
 	}
 
-	/**
+	/*
 	 * Initialize the contents of the frame.
 	 */
-	private void initialize()
-	{
+	private void initialize() {
 		fileChooser = new JFileChooser();
 		frmChatServerV = new JFrame();
 		frmChatServerV.setTitle("Chat Server v0.1");
@@ -92,7 +92,7 @@ public class ChatWindow
 		frmChatServerV.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frmChatServerV.getContentPane().setLayout(null);
 
-		final JLabel curFriend = new JLabel("New label");
+		curFriend = new JLabel("New label");
 		curFriend.setBounds(164, 12, 61, 17);
 		frmChatServerV.getContentPane().add(curFriend);
 
@@ -102,17 +102,13 @@ public class ChatWindow
 		frmChatServerV.getContentPane().add(scrollPane_2);
 
 		UserList = new JList(listModel);
-		UserList.addMouseListener(new MouseAdapter()
-		{
+		UserList.addMouseListener(new MouseAdapter() {
 			@Override
-			public void mousePressed(MouseEvent mouseEvent)
-			{
+			public void mousePressed(MouseEvent mouseEvent) {
 				JList theList = (JList) mouseEvent.getSource();
-				if (mouseEvent.getClickCount() == 2)
-				{
+				if (mouseEvent.getClickCount() == 2) {
 					int index = theList.locationToIndex(mouseEvent.getPoint());
-					if (index >= 0)
-					{
+					if (index >= 0) {
 						Object o = theList.getModel().getElementAt(index);
 						System.out.println("Double-clicked on: '"
 								+ o.toString() + "'");
@@ -126,24 +122,32 @@ public class ChatWindow
 
 		addNewUser = new JTextField();
 		addNewUser.setBounds(12, 41, 140, 21);
-		addNewUser.addKeyListener(new KeyAdapter()
-		{
+		addNewUser.addKeyListener(new KeyAdapter() {
 			@Override
-			public void keyPressed(KeyEvent e)
-			{
-				if (e.getKeyCode() == KeyEvent.VK_ENTER)
-				{
+			public void keyPressed(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
 					String newUser = addNewUser.getText();
-					// To DO: Append This New User to Users
-					System.out.println("ENTER pressed. Value Entered: "
+					// TODO : Append This New User to Users
+					Global.Log("ENTER pressed. Value Entered: "
 							+ newUser);
 					addNewUser.setText(null);
-					if (newUser.equals(""))
-					{
-						System.out.println("Empty Value. Do nothing");
+					if (newUser.equals("")) {
+						Global.Log("Empty Value. Do nothing");
 						return;
 					}
-					listModel.addElement(newUser);
+					if (listModel.contains(newUser) == false) {
+						listModel.addElement(newUser);
+						newUserFile = new File(userContainerPath + newUser);
+						try {
+							if (newUserFile.createNewFile()) {
+								Global.Log("File is created!");
+							} else {
+								Global.Log("File already exists.");
+							}
+						} catch (IOException e1) {
+							Global.Log("File Cannot be created");
+						}
+					}
 				}
 			}
 		});
@@ -156,24 +160,19 @@ public class ChatWindow
 
 		JButton btnSendMessage = new JButton("Send");
 		btnSendMessage.setBounds(467, 307, 67, 45);
-		btnSendMessage.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
-				if (!fileSize.getText().equals("0 Bytes"))
-				{
+		btnSendMessage.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (!fileSize.getText().equals("0 Bytes")) {
 					currentMessageBox.append("\n" + "File : "
 							+ filename.getText() + ", Size : "
 							+ fileSize.getText() + ".");
 				}
 				String msg;
-				synchronized (currentMessageBox)
-				{
+				synchronized (currentMessageBox) {
 					msg = currentMessageBox.getText();
 					currentMessageBox.notify();
 				}
-				if (msg.length() > 0)
-				{
+				if (msg.length() > 0) {
 					currentChatBox.append("\n" + "You: ");
 					currentChatBox.append(msg);
 				}
@@ -187,37 +186,25 @@ public class ChatWindow
 
 		JButton btnTransferFile = new JButton("File");
 		btnTransferFile.setBounds(164, 386, 69, 23);
-		btnTransferFile.addActionListener(new ActionListener()
-		{
-			public void actionPerformed(ActionEvent e)
-			{
+		btnTransferFile.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
 				int hasSelected = fileChooser.showOpenDialog(frmChatServerV);
-				if (hasSelected == JFileChooser.APPROVE_OPTION)
-				{
+				if (hasSelected == JFileChooser.APPROVE_OPTION) {
 					File curFile = fileChooser.getSelectedFile();
 					filename.setText(curFile.getName());
 					long size = curFile.length();
-					if (size > 1000000)
-					{
+					if (size > 1000000) {
 						float val = (size / 1000000);
 						fileSize.setText(val + "MB");
-					}
-					else if (size > 1000)
-					{
+					} else if (size > 1000) {
 						float val = (size / 1000);
 						fileSize.setText(val + "KB");
-					}
-					else if (size > 0)
-					{
+					} else if (size > 0) {
 						fileSize.setText(size + "B");
-					}
-					else
-					{
+					} else {
 						fileSize.setText("Too large.");
 					}
-				}
-				else
-				{
+				} else {
 					filename.setText("No file chosen.");
 					fileSize.setText("0 bytes");
 				}
@@ -230,20 +217,31 @@ public class ChatWindow
 		frmChatServerV.getContentPane().add(scrollPane);
 
 		currentMessageBox = new JTextArea();
-		currentMessageBox.addKeyListener(new KeyAdapter()
-		{
+		currentMessageBox.addKeyListener(new KeyAdapter() {
 			@Override
-			public void keyPressed(KeyEvent e)
-			{
-				if (e.getKeyCode() == KeyEvent.VK_ENTER)
-				{
+			public void keyPressed(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
 					String curText = addNewUser.getText();
-					// To DO: Append This New User to Users
 					System.out.println("ENTER pressed. Value Entered: "
 							+ curText);
-					if (curText.equals(""))
-						System.out.println("Empty Value. Do nothing");
 					addNewUser.setText(null);
+					if (curText.equals("") == false){
+						currentMessageBox.append(curText);
+						curMessage.content = curText;
+						curMessage.destNick = curFriend.getText();
+						synchronized (messageQueue)
+						{
+							messageQueue.addMessage(curMessage);
+							messageQueue.notify();
+						}
+					}
+					if(!fileSize.getText().equals("0 Bytes")){
+						currentMessageBox.append("\n" + "File : "
+								+ filename.getText() + ", Size : "
+								+ fileSize.getText() + ".");
+						
+					}
+					
 				}
 
 			}
