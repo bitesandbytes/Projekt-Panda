@@ -2,9 +2,11 @@ package clientCoreThreads;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import javax.swing.JLabel;
 import javax.swing.JTextArea;
 
 import common.Message;
@@ -16,26 +18,28 @@ public class ChatReceiveThread extends Thread
 	private ObjectInputStream inStream;
 	private Message currentMessage;
 	private final static int msgRcvPort = Global.localMsgReceivePort;
-	public JTextArea msgBox;
+	public JTextArea chatBox;
+	public JLabel curFriendLabel = Global.currentFriendLabel;
+	PrintWriter writer;
 	
-	public ChatReceiveThread(JTextArea msgBox){
+	public ChatReceiveThread(JTextArea chatBox){
 		super();
-		this.msgBox = msgBox;
+		this.chatBox = chatBox;
 		
 	}
 
 	public void run()
 	{
-		System.out.println("Spawned ChatReceiveThread");
+		Global.Log("Spawned ChatReceiveThread");
 		try
 		{
 			msgServer = new ServerSocket(msgRcvPort);
 		}
 		catch (IOException e)
 		{
-			System.out.println("FATAL ERROR : Unable to bind to local port @ "
+			Global.Log("FATAL ERROR : Unable to bind to local port @ "
 					+ msgRcvPort);
-			System.out.println("Terminating application.");
+			Global.Log("Terminating application.");
 			System.exit(0);
 		}
 		while (true)
@@ -44,13 +48,21 @@ public class ChatReceiveThread extends Thread
 			{
 				currentMessage = getMessage(msgServer.accept());
 				if (currentMessage != null){
-					System.out.println(currentMessage.sourceNick + ": "
-							+ currentMessage.content);
+					//Global.Log(currentMessage.sourceNick + ": "+ currentMessage.content);
+					if(curFriendLabel.getText().equals(currentMessage.sourceNick)){
+						writer = new PrintWriter(Global.userContainerPath+currentMessage.sourceNick, "UTF-8");
+						writer.print(currentMessage.content);
+						writer.close();
+						synchronized (chatBox)
+						{
+							chatBox.append(currentMessage.content);
+						}
+					}
 				}
 			}
 			catch (Exception ex)
 			{
-				System.out.println("Lost a message packet.");
+				Global.Log("Lost a message packet.");
 				continue;
 			}
 		}
@@ -59,11 +71,11 @@ public class ChatReceiveThread extends Thread
 	private Message getMessage(Socket serverSocket) throws Exception
 	{
 		inStream = new ObjectInputStream(serverSocket.getInputStream());
-		System.out.println("Got OIS : ChatReceiveThread.");
+		Global.Log("Got OIS : ChatReceiveThread.");
 		Message rcvMessage = (Message) inStream.readObject();
-		System.out.println("Got Message Obj | ChatReceiveThread.");
+		Global.Log("Got Message Obj | ChatReceiveThread.");
 		serverSocket.close();
-		System.out.println("Closed server connection | ChatReceiveThread.");
+		Global.Log("Closed server connection | ChatReceiveThread.");
 		return rcvMessage;
 
 	}

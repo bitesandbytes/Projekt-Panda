@@ -9,7 +9,12 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+import java.util.Scanner;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -27,6 +32,7 @@ import javax.swing.UIManager;
 import common.Message;
 import coreClient.Global;
 import coreClient.MessageQueue;
+import clientCoreThreads.ChatReceiveThread;
 import clientCoreThreads.WriteUserInputThread;
 
 public class ChatWindow {
@@ -37,15 +43,16 @@ public class ChatWindow {
 	private WriteUserInputThread msgWriter;
 	DefaultListModel listModel;
 	JList UserList;
-	private JTextArea currentMessageBox;
+	private JTextArea currentSendMessageBox;
 	private JTextArea currentChatBox;
 	private JLabel filename;
 	private JLabel fileSize;
-	File newUserFile;
+	File curFriendFile;
+	PrintWriter writer;
 	private String userContainerPath = Global.userContainerPath;
 	
 	
-	JLabel curFriend =  Global.currentFriend;
+	JLabel curFriend =  Global.currentFriendLabel;
 	private Message curMessage;
 	public MessageQueue messageQueue = Global.msgQueue;
 	
@@ -112,7 +119,18 @@ public class ChatWindow {
 						Object o = theList.getModel().getElementAt(index);
 						System.out.println("Double-clicked on: '"
 								+ o.toString() + "'");
+						
 						curFriend.setText(o.toString());
+						System.out.println(userContainerPath + curFriend.getText());
+						String content = null;
+						try {
+							content = new Scanner(new File(userContainerPath + curFriend.getText())).useDelimiter("\\Z").next();
+						} catch (FileNotFoundException e) {
+							Global.Log("Can't Open File of: "+curFriend.getText());
+						}
+						currentSendMessageBox.setEditable(true);
+						currentChatBox.setText(null);
+						currentChatBox.setText(content);
 					}
 				}
 			}
@@ -137,9 +155,9 @@ public class ChatWindow {
 					}
 					if (listModel.contains(newUser) == false) {
 						listModel.addElement(newUser);
-						newUserFile = new File(userContainerPath + newUser);
+						curFriendFile = new File(userContainerPath + newUser);
 						try {
-							if (newUserFile.createNewFile()) {
+							if (curFriendFile.createNewFile()) {
 								Global.Log("File is created!");
 							} else {
 								Global.Log("File already exists.");
@@ -163,14 +181,14 @@ public class ChatWindow {
 		btnSendMessage.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (!fileSize.getText().equals("0 Bytes")) {
-					currentMessageBox.append("\n" + "File : "
+					currentSendMessageBox.append("\n" + "File : "
 							+ filename.getText() + ", Size : "
 							+ fileSize.getText() + ".");
 				}
 				String msg;
-				synchronized (currentMessageBox) {
-					msg = currentMessageBox.getText();
-					currentMessageBox.notify();
+				synchronized (currentSendMessageBox) {
+					msg = currentSendMessageBox.getText();
+					currentSendMessageBox.notify();
 				}
 				if (msg.length() > 0) {
 					currentChatBox.append("\n" + "You: ");
@@ -216,27 +234,38 @@ public class ChatWindow {
 		scrollPane.setBounds(164, 289, 290, 85);
 		frmChatServerV.getContentPane().add(scrollPane);
 
-		currentMessageBox = new JTextArea();
-		currentMessageBox.addKeyListener(new KeyAdapter() {
+		currentSendMessageBox = new JTextArea();
+		currentSendMessageBox.setEditable(false);
+		currentSendMessageBox.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent e) {
 				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-					String curText = addNewUser.getText();
+					String curText = currentSendMessageBox.getText();
 					System.out.println("ENTER pressed. Value Entered: "
 							+ curText);
 					addNewUser.setText(null);
 					if (curText.equals("") == false){
-						currentMessageBox.append(curText);
-						curMessage.content = curText;
-						curMessage.destNick = curFriend.getText();
+						currentChatBox.append(curText);
+						curMessage = new Message("1", curFriend.getText(), curText);
+						//curMessage.content = ;
+						//curMessage.destNick = ;
 						synchronized (messageQueue)
 						{
 							messageQueue.addMessage(curMessage);
 							messageQueue.notify();
 						}
+						try {
+							writer = new PrintWriter(userContainerPath+curFriend.getText(), "UTF-8");
+						} catch (FileNotFoundException e1) {
+							System.out.println("Unable To Find File");
+						} catch (UnsupportedEncodingException e1) {
+							System.out.println("Stop Using UTF-8");
+						}
+						writer.print(curText);
+						writer.close();
 					}
 					if(!fileSize.getText().equals("0 Bytes")){
-						currentMessageBox.append("\n" + "File : "
+						currentSendMessageBox.append("\n" + "File : "
 								+ filename.getText() + ", Size : "
 								+ fileSize.getText() + ".");
 						
@@ -246,8 +275,8 @@ public class ChatWindow {
 
 			}
 		});
-		scrollPane.setViewportView(currentMessageBox);
-		msgWriter = new WriteUserInputThread(currentMessageBox);
+		scrollPane.setViewportView(currentSendMessageBox);
+		msgWriter = new WriteUserInputThread(currentSendMessageBox);
 		msgWriter.start();
 
 		JScrollPane scrollPane_1 = new JScrollPane();
@@ -257,6 +286,7 @@ public class ChatWindow {
 		currentChatBox = new JTextArea();
 		currentChatBox.setEditable(false);
 		scrollPane_1.setViewportView(currentChatBox);
+		(new ChatReceiveThread(currentChatBox)).start();
 
 		filename = new JLabel("No file chosen.");
 		filename.setFont(new Font("Liberation Sans", Font.PLAIN, 13));
