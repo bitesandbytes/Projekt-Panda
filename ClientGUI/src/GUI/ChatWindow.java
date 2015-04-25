@@ -2,8 +2,17 @@ package GUI;
 
 import java.awt.EventQueue;
 import java.awt.Font;
-import java.awt.event.*;
-import java.io.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.Scanner;
 
 import javax.swing.DefaultListModel;
@@ -20,8 +29,8 @@ import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 
 import clientCoreThreads.ChatReceiveThread;
+import clientCoreThreads.FileReceiverThread;
 import clientCoreThreads.FileSendControlThread;
-import clientCoreThreads.NewFileReceiveThread;
 import common.Message;
 import coreClient.Global;
 import coreClient.MessageQueue;
@@ -356,7 +365,7 @@ public class ChatWindow
 		fileSize.setFont(new Font("Liberation Sans", Font.PLAIN, 13));
 		fileSize.setBounds(439, 390, 80, 17);
 		frmChatServerV.getContentPane().add(fileSize);
-		(new NewFileReceiveThread()).start();
+		(new FileReceiverThread(currentChatBox)).start();
 	}
 
 	public void enableFileTransfer()
