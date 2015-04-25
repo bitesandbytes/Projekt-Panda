@@ -21,7 +21,7 @@ public class ChatSendThread extends Thread
 	public ChatSendThread()
 	{
 		super();
-		msgQueue = new MessageQueue();
+		msgQueue = Global.msgQueue;
 	}
 
 	private void sendMessageObj() throws IOException

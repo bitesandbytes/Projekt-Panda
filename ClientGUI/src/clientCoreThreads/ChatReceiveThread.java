@@ -1,5 +1,8 @@
 package clientCoreThreads;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.PrintWriter;
@@ -19,8 +22,8 @@ public class ChatReceiveThread extends Thread
 	private Message currentMessage;
 	private final static int msgRcvPort = Global.localMsgReceivePort;
 	public JTextArea chatBox;
-	public JLabel curFriendLabel = Global.currentFriendLabel;
 	PrintWriter writer;
+	File curFriendFile;
 
 	public ChatReceiveThread(JTextArea chatBox)
 	{
@@ -35,8 +38,7 @@ public class ChatReceiveThread extends Thread
 		try
 		{
 			msgServer = new ServerSocket(msgRcvPort);
-		}
-		catch (IOException e)
+		} catch (IOException e)
 		{
 			Global.Log("FATAL ERROR : Unable to bind to local port @ "
 					+ msgRcvPort);
@@ -52,22 +54,36 @@ public class ChatReceiveThread extends Thread
 				{
 					// Global.Log(currentMessage.sourceNick + ": "+
 					// currentMessage.content);
-					if (curFriendLabel.getText().equals(
-							currentMessage.sourceNick))
+					try
 					{
-						writer = new PrintWriter(Global.userContainerPath
-								+ currentMessage.sourceNick, "UTF-8");
-						writer.print(currentMessage.content);
-						writer.close();
-						synchronized (chatBox)
-						{
-							chatBox.append(currentMessage.content);
-						}
+						curFriendFile = new File(Global.userContainerPath
+								+ currentMessage.sourceNick);
+						Global.Log("Opened File: " + Global.userContainerPath
+								+ currentMessage.sourceNick);
+						FileWriter fw = new FileWriter(curFriendFile, true);
+						BufferedWriter bw = new BufferedWriter(fw);
+						Global.Log("Begin To Write");
+						bw.write("\n" + currentMessage.content);
+						bw.close();
+						Global.Log("Wrote: " + currentMessage.content);
+					} catch (IOException e1)
+					{
+						Global.Log("Unable to write into File");
+					}
+					if (Global.window.curFriend.getText().equals(currentMessage.sourceNick))
+					{
+						/*
+						 * writer = new PrintWriter(Global.userContainerPath +
+						 * currentMessage.sourceNick, "UTF-8");
+						 * writer.print(currentMessage.content); writer.close();
+						 */
+						Global.Log("Appending");
+						chatBox.append("\n"+currentMessage.content);
 					}
 				}
-			}
-			catch (Exception ex)
+			} catch (Exception ex)
 			{
+				ex.printStackTrace();
 				Global.Log("Lost a message packet.");
 				continue;
 			}
@@ -82,6 +98,8 @@ public class ChatReceiveThread extends Thread
 		Global.Log("Got Message Obj | ChatReceiveThread.");
 		serverSocket.close();
 		Global.Log("Closed server connection | ChatReceiveThread.");
+		Global.Log("Receiver : " + rcvMessage.sourceNick + "->"
+				+ rcvMessage.destNick + ": " + rcvMessage.content);
 		return rcvMessage;
 
 	}

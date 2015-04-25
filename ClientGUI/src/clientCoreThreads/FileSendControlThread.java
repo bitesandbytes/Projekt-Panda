@@ -92,8 +92,7 @@ public class FileSendControlThread extends Thread
 		else
 		{
 			Global.Log("FSCT: Setting up connection directly to client");
-			(new FileSenderThread(filePath, fileName, fileControlPack.payload,
-					msgBox, fileButton)).start();
+			(new FileSenderThread(filePath, fileName, fileControlPack.payload, msgBox, fileButton)).start();
 		}
 	}
 

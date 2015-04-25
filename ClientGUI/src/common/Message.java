@@ -12,7 +12,7 @@ public class Message implements Serializable
 	public Message(String sn, String dn, String c)
 	{
 		sourceNick = sn;
-		destNick = sn;
+		destNick = dn;
 		content = c;
 	}
 }

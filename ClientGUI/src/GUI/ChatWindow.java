@@ -8,8 +8,10 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
@@ -27,18 +29,21 @@ import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
+import javax.swing.text.DefaultCaret;
 
 import clientCoreThreads.ChatReceiveThread;
 import clientCoreThreads.FileReceiverThread;
 import clientCoreThreads.FileSendControlThread;
+import clientCoreThreads.ChatSendThread;
 import common.Message;
 import coreClient.Global;
 import coreClient.MessageQueue;
 
+
 public class ChatWindow
 {
 
-	private JFrame frmChatServerV;
+	public JFrame frmChatServerV;
 	private JTextField addNewUser;
 	private String filePath;
 	private JFileChooser fileChooser;
@@ -53,7 +58,7 @@ public class ChatWindow
 	File curFriendFile;
 	PrintWriter writer;
 	private String userContainerPath = Global.userContainerPath;
-	JLabel curFriend = Global.currentFriendLabel;
+	public JLabel curFriend;
 	private Message curMessage;
 	public MessageQueue messageQueue = Global.msgQueue;
 	private JButton fileTransfer;
@@ -61,14 +66,13 @@ public class ChatWindow
 	/**
 	 * Launch the application.
 	 */
-	public void main(String[] args)
+	public static void main(String[] args)
 	{
 		try
 		{
 			UIManager
 					.setLookAndFeel("com.jtattoo.plaf.graphite.GraphiteLookAndFeel");
-		}
-		catch (Throwable e)
+		} catch (Throwable e)
 		{
 			e.printStackTrace();
 		}
@@ -82,8 +86,7 @@ public class ChatWindow
 					window.frmChatServerV.setVisible(true);
 					window.frmChatServerV.setResizable(false);
 					window.frmChatServerV.setLocationRelativeTo(null);
-				}
-				catch (Exception e)
+				} catch (Exception e)
 				{
 					e.printStackTrace();
 				}
@@ -97,7 +100,7 @@ public class ChatWindow
 	public ChatWindow()
 	{
 		initialize();
-		//start(null);
+		// start(null);
 	}
 
 	/*
@@ -112,6 +115,8 @@ public class ChatWindow
 		frmChatServerV.setBounds(100, 100, 552, 451);
 		frmChatServerV.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frmChatServerV.getContentPane().setLayout(null);
+		
+		(new ChatSendThread()).start();
 
 		curFriend = new JLabel("New label");
 		curFriend.setBounds(164, 12, 61, 17);
@@ -137,7 +142,6 @@ public class ChatWindow
 						Object o = theList.getModel().getElementAt(index);
 						System.out.println("Double-clicked on: '"
 								+ o.toString() + "'");
-
 						curFriend.setText(o.toString());
 						System.out.println(userContainerPath
 								+ curFriend.getText());
@@ -147,8 +151,7 @@ public class ChatWindow
 							content = new Scanner(new File(userContainerPath
 									+ curFriend.getText())).useDelimiter("\\Z")
 									.next();
-						}
-						catch (FileNotFoundException e)
+						} catch (FileNotFoundException e)
 						{
 							Global.Log("Can't Open File of: "
 									+ curFriend.getText());
@@ -174,7 +177,7 @@ public class ChatWindow
 				{
 					String newUser = addNewUser.getText();
 					// TODO : Append This New User to Users
-					Global.Log("ENTER pressed. Value Entered: " + newUser);
+					Global.Log("ENTER pressed. User Entered: " + newUser);
 					addNewUser.setText(null);
 					if (newUser.equals(""))
 					{
@@ -184,23 +187,33 @@ public class ChatWindow
 					if (listModel.contains(newUser) == false)
 					{
 						listModel.addElement(newUser);
-
 						curFriendFile = new File(userContainerPath + newUser);
+
 						try
 						{
 							if (curFriendFile.createNewFile())
 							{
 								Global.Log("File is created!");
-							}
-							else
+								try
+								{
+									writer = new PrintWriter(userContainerPath
+											+ newUser, "UTF-8");
+								} catch (FileNotFoundException
+										| UnsupportedEncodingException e2)
+								{
+									Global.Log("Unable to open the file that has been created");
+								}
+								writer.print("Messages Read From File:");
+								writer.close();
+							} else
 							{
 								Global.Log("File already exists.");
 							}
-						}
-						catch (IOException e1)
+						} catch (IOException e1)
 						{
 							Global.Log("File Cannot be created");
 						}
+
 					}
 				}
 			}
@@ -218,12 +231,42 @@ public class ChatWindow
 		{
 			public void actionPerformed(ActionEvent e)
 			{
+				String curText = currentSendMessageBox.getText();
+				currentSendMessageBox.setText("");
+				if (curText.equals("") == false)
+				{
+					currentChatBox.append("\n" + curText);
+					//Global.Log(curFriend.getText());
+					curMessage = new Message(Global.myNick,curFriend.getText(),curText);
+					// curMessage.content = ;
+					// curMessage.destNick = ;
+
+					curFriendFile = new File(userContainerPath
+							+ curFriend.getText());
+					try
+					{
+						FileWriter fw = new FileWriter(curFriendFile, true);
+						BufferedWriter bw = new BufferedWriter(fw);
+						bw.write("\n" + curText);
+						bw.close();
+						Global.Log("Wrote: " + curText);
+					} catch (IOException e1)
+					{
+						Global.Log("Unable to write into File");
+					}
+					Global.Log("Contents of current Message: "+curMessage.sourceNick+"->"+curMessage.destNick+": "+curMessage.content);
+					synchronized (messageQueue)
+					{
+						messageQueue.addMessage(curMessage);
+						messageQueue.notify();
+					}
+					Global.Log("reached Part After DeadLock");
+				}
 				if (!fileSize.getText().equals("0 Bytes"))
 				{
 					currentSendMessageBox.append("\n" + "File : "
-
-					+ filename.getText() + ", Size : " + fileSize.getText()
-							+ ".");
+							+ filename.getText() + ", Size : "
+							+ fileSize.getText() + ".");
 				}
 				String msg;
 				synchronized (currentSendMessageBox)
@@ -237,12 +280,13 @@ public class ChatWindow
 					currentChatBox.append("\n" + "You: ");
 					currentChatBox.append(msg);
 				}
-				String filepath = filePath;
-				String dest = curFriend.getText();
-				JTextArea msgBox = currentChatBox;
-				JButton sendButton = fileTransfer;
-				(new FileSendControlThread(dest, filepath, msgBox, sendButton))
-						.start();
+				/*
+				 * String filepath = filePath; String dest =
+				 * curFriend.getText(); JTextArea msgBox = currentChatBox;
+				 * JButton sendButton = fileTransfer; (new
+				 * FileSendControlThread(dest, filepath, msgBox, sendButton))
+				 * .start();
+				 */
 			}
 		});
 		frmChatServerV.getContentPane().add(btnSendMessage);
@@ -264,22 +308,18 @@ public class ChatWindow
 					{
 						float val = (size / 1000000);
 						fileSize.setText(val + "MB");
-					}
-					else if (size > 1000)
+					} else if (size > 1000)
 					{
 						float val = (size / 1000);
 						fileSize.setText(val + "KB");
-					}
-					else if (size > 0)
+					} else if (size > 0)
 					{
 						fileSize.setText(size + "B");
-					}
-					else
+					} else
 					{
 						fileSize.setText("Too large.");
 					}
-				}
-				else
+				} else
 				{
 					filename.setText("No file chosen.");
 					fileSize.setText("0 bytes");
@@ -301,44 +341,6 @@ public class ChatWindow
 			{
 				if (e.getKeyCode() == KeyEvent.VK_ENTER)
 				{
-					String curText = currentSendMessageBox.getText();
-					System.out.println("ENTER pressed. Value Entered: "
-							+ curText);
-					addNewUser.setText(null);
-					if (curText.equals("") == false)
-					{
-						currentChatBox.append(curText);
-						curMessage = new Message("1", curFriend.getText(),
-								curText);
-						// curMessage.content = ;
-						// curMessage.destNick = ;
-						synchronized (messageQueue)
-						{
-							messageQueue.addMessage(curMessage);
-							messageQueue.notify();
-						}
-						try
-						{
-							writer = new PrintWriter(userContainerPath
-									+ curFriend.getText(), "UTF-8");
-						}
-						catch (FileNotFoundException e1)
-						{
-							System.out.println("Unable To Find File");
-						}
-						catch (UnsupportedEncodingException e1)
-						{
-							System.out.println("Stop Using UTF-8");
-						}
-						writer.print(curText);
-						writer.close();
-					}
-					if (!fileSize.getText().equals("0 Bytes"))
-					{
-						currentSendMessageBox.append("\n" + "File : "
-								+ filename.getText() + ", Size : "
-								+ fileSize.getText() + ".");
-					}
 
 				}
 
@@ -352,6 +354,8 @@ public class ChatWindow
 
 		currentChatBox = new JTextArea();
 		currentChatBox.setEditable(false);
+		DefaultCaret caret = (DefaultCaret)currentChatBox.getCaret();
+		caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 		scrollPane_1.setViewportView(currentChatBox);
 		(new ChatReceiveThread(currentChatBox)).start();
 

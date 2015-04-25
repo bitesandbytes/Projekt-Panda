@@ -17,12 +17,13 @@ public class MessageQueue
 
 	public void addMessage(Message message)
 	{
-		System.out.println("Adding msg : " + message.sourceNick + "->"
-				+ message.destNick + ":" + message.content);
+		
 		synchronized (messageQueue)
 		{
 			messageQueue.add(message);
 		}
+		System.out.println("Added msg : " + message.sourceNick + "->"
+				+ message.destNick + ":" + message.content);
 	}
 
 	public Message getMessage()
