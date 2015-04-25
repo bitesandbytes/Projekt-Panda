@@ -35,7 +35,8 @@ import coreClient.MessageQueue;
 import clientCoreThreads.ChatReceiveThread;
 import clientCoreThreads.WriteUserInputThread;
 
-public class ChatWindow {
+public class ChatWindow
+{
 
 	private JFrame frmChatServerV;
 	private JTextField addNewUser;
@@ -50,31 +51,38 @@ public class ChatWindow {
 	File curFriendFile;
 	PrintWriter writer;
 	private String userContainerPath = Global.userContainerPath;
-	
-	
 	JLabel curFriend =  Global.currentFriendLabel;
 	private Message curMessage;
 	public MessageQueue messageQueue = Global.msgQueue;
-	
+	private JButton fileTransfer;
 
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String[] args) {
-		try {
+	public static void main(String[] args)
+	{
+		try
+		{
 			UIManager
 					.setLookAndFeel("com.jtattoo.plaf.graphite.GraphiteLookAndFeel");
-		} catch (Throwable e) {
+		}
+		catch (Throwable e)
+		{
 			e.printStackTrace();
 		}
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
+		EventQueue.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				try
+				{
 					ChatWindow window = new ChatWindow();
 					window.frmChatServerV.setVisible(true);
 					window.frmChatServerV.setResizable(false);
 					window.frmChatServerV.setLocationRelativeTo(null);
-				} catch (Exception e) {
+				}
+				catch (Exception e)
+				{
 					e.printStackTrace();
 				}
 			}
@@ -84,14 +92,16 @@ public class ChatWindow {
 	/**
 	 * Create the application.
 	 */
-	public ChatWindow() {
+	public ChatWindow()
+	{
 		initialize();
 	}
 
 	/*
 	 * Initialize the contents of the frame.
 	 */
-	private void initialize() {
+	private void initialize()
+	{
 		fileChooser = new JFileChooser();
 		frmChatServerV = new JFrame();
 		frmChatServerV.setTitle("Chat Server v0.1");
@@ -109,13 +119,17 @@ public class ChatWindow {
 		frmChatServerV.getContentPane().add(scrollPane_2);
 
 		UserList = new JList(listModel);
-		UserList.addMouseListener(new MouseAdapter() {
+		UserList.addMouseListener(new MouseAdapter()
+		{
 			@Override
-			public void mousePressed(MouseEvent mouseEvent) {
+			public void mousePressed(MouseEvent mouseEvent)
+			{
 				JList theList = (JList) mouseEvent.getSource();
-				if (mouseEvent.getClickCount() == 2) {
+				if (mouseEvent.getClickCount() == 2)
+				{
 					int index = theList.locationToIndex(mouseEvent.getPoint());
-					if (index >= 0) {
+					if (index >= 0)
+					{
 						Object o = theList.getModel().getElementAt(index);
 						System.out.println("Double-clicked on: '"
 								+ o.toString() + "'");
@@ -140,29 +154,38 @@ public class ChatWindow {
 
 		addNewUser = new JTextField();
 		addNewUser.setBounds(12, 41, 140, 21);
-		addNewUser.addKeyListener(new KeyAdapter() {
+		addNewUser.addKeyListener(new KeyAdapter()
+		{
 			@Override
-			public void keyPressed(KeyEvent e) {
-				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+			public void keyPressed(KeyEvent e)
+			{
+				if (e.getKeyCode() == KeyEvent.VK_ENTER)
+				{
 					String newUser = addNewUser.getText();
 					// TODO : Append This New User to Users
-					Global.Log("ENTER pressed. Value Entered: "
-							+ newUser);
+					Global.Log("ENTER pressed. Value Entered: " + newUser);
 					addNewUser.setText(null);
-					if (newUser.equals("")) {
+					if (newUser.equals(""))
+					{
 						Global.Log("Empty Value. Do nothing");
 						return;
 					}
-					if (listModel.contains(newUser) == false) {
+					if (listModel.contains(newUser) == false)
+					{
 						listModel.addElement(newUser);
+
 						curFriendFile = new File(userContainerPath + newUser);
 						try {
 							if (curFriendFile.createNewFile()) {
 								Global.Log("File is created!");
-							} else {
+							}
+							else
+							{
 								Global.Log("File already exists.");
 							}
-						} catch (IOException e1) {
+						}
+						catch (IOException e1)
+						{
 							Global.Log("File Cannot be created");
 						}
 					}
@@ -182,6 +205,7 @@ public class ChatWindow {
 			public void actionPerformed(ActionEvent e) {
 				if (!fileSize.getText().equals("0 Bytes")) {
 					currentSendMessageBox.append("\n" + "File : "
+
 							+ filename.getText() + ", Size : "
 							+ fileSize.getText() + ".");
 				}
@@ -189,8 +213,10 @@ public class ChatWindow {
 				synchronized (currentSendMessageBox) {
 					msg = currentSendMessageBox.getText();
 					currentSendMessageBox.notify();
+
 				}
-				if (msg.length() > 0) {
+				if (msg.length() > 0)
+				{
 					currentChatBox.append("\n" + "You: ");
 					currentChatBox.append(msg);
 				}
@@ -202,37 +228,50 @@ public class ChatWindow {
 		});
 		frmChatServerV.getContentPane().add(btnSendMessage);
 
-		JButton btnTransferFile = new JButton("File");
-		btnTransferFile.setBounds(164, 386, 69, 23);
-		btnTransferFile.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+		fileTransfer = new JButton("File");
+		fileTransfer.setBounds(164, 386, 69, 23);
+		fileTransfer.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
 				int hasSelected = fileChooser.showOpenDialog(frmChatServerV);
-				if (hasSelected == JFileChooser.APPROVE_OPTION) {
+				if (hasSelected == JFileChooser.APPROVE_OPTION)
+				{
 					File curFile = fileChooser.getSelectedFile();
 					filename.setText(curFile.getName());
 					long size = curFile.length();
-					if (size > 1000000) {
+					if (size > 1000000)
+					{
 						float val = (size / 1000000);
 						fileSize.setText(val + "MB");
-					} else if (size > 1000) {
+					}
+					else if (size > 1000)
+					{
 						float val = (size / 1000);
 						fileSize.setText(val + "KB");
-					} else if (size > 0) {
+					}
+					else if (size > 0)
+					{
 						fileSize.setText(size + "B");
-					} else {
+					}
+					else
+					{
 						fileSize.setText("Too large.");
 					}
-				} else {
+				}
+				else
+				{
 					filename.setText("No file chosen.");
 					fileSize.setText("0 bytes");
 				}
 			}
 		});
-		frmChatServerV.getContentPane().add(btnTransferFile);
+		frmChatServerV.getContentPane().add(fileTransfer);
 
 		JScrollPane scrollPane = new JScrollPane();
 		scrollPane.setBounds(164, 289, 290, 85);
 		frmChatServerV.getContentPane().add(scrollPane);
+
 
 		currentSendMessageBox = new JTextArea();
 		currentSendMessageBox.setEditable(false);
@@ -268,9 +307,9 @@ public class ChatWindow {
 						currentSendMessageBox.append("\n" + "File : "
 								+ filename.getText() + ", Size : "
 								+ fileSize.getText() + ".");
-						
+
 					}
-					
+
 				}
 
 			}
@@ -298,6 +337,12 @@ public class ChatWindow {
 		fileSize.setFont(new Font("Liberation Sans", Font.PLAIN, 13));
 		fileSize.setBounds(439, 390, 80, 17);
 		frmChatServerV.getContentPane().add(fileSize);
+	}
 
+	public void enableFileTransfer()
+	{
+		fileTransfer.setEnabled(true);
+		filename.setText("No file chosen.");
+		fileSize.setText("0 Bytes");
 	}
 }
