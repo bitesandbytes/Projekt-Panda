@@ -276,8 +276,11 @@ public class ChatWindow
 				String dest = curFriend.getText();
 				JTextArea msgBox = currentChatBox;
 				JButton sendButton = fileTransfer;
-				(new FileSendControlThread(dest, filepath, msgBox, sendButton))
-						.start();
+				Global.Log("Status: " + filename.getText() + ", "
+						+ fileSize.getText());
+				if (fileSize.getText().compareTo("0 Bytes") != 0)
+					(new FileSendControlThread(dest, filepath, msgBox,
+							sendButton)).start();
 			}
 		});
 		frmChatServerV.getContentPane().add(btnSendMessage);
@@ -373,5 +376,6 @@ public class ChatWindow
 		fileTransfer.setEnabled(true);
 		filename.setText("No file chosen.");
 		fileSize.setText("0 Bytes");
+		Global.fileTransferAllowed = true;
 	}
 }

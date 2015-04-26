@@ -41,6 +41,7 @@ public class FileSenderThread extends Thread
 	@SuppressWarnings("resource")
 	public void run()
 	{
+		Global.fileTransferAllowed = false;
 		fileButton.setEnabled(false);
 		socketChannel = null;
 		try

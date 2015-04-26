@@ -18,6 +18,7 @@ public class Global
 	public static String userContainerPath = "/home/sauce/Documents/";
 	public static ChatWindow window;
 	public static ChatReceiveThread chatReceiveThread;
+	public static boolean fileTransferAllowed = true;
 
 	public static void Log(Object o)
 	{
