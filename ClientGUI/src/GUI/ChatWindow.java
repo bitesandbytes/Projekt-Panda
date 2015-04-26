@@ -39,7 +39,6 @@ import common.Message;
 import coreClient.Global;
 import coreClient.MessageQueue;
 
-
 public class ChatWindow
 {
 
@@ -72,7 +71,8 @@ public class ChatWindow
 		{
 			UIManager
 					.setLookAndFeel("com.jtattoo.plaf.graphite.GraphiteLookAndFeel");
-		} catch (Throwable e)
+		}
+		catch (Throwable e)
 		{
 			e.printStackTrace();
 		}
@@ -86,7 +86,8 @@ public class ChatWindow
 					window.frmChatServerV.setVisible(true);
 					window.frmChatServerV.setResizable(false);
 					window.frmChatServerV.setLocationRelativeTo(null);
-				} catch (Exception e)
+				}
+				catch (Exception e)
 				{
 					e.printStackTrace();
 				}
@@ -115,7 +116,7 @@ public class ChatWindow
 		frmChatServerV.setBounds(100, 100, 552, 451);
 		frmChatServerV.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frmChatServerV.getContentPane().setLayout(null);
-		
+
 		(new ChatSendThread()).start();
 
 		curFriend = new JLabel("New label");
@@ -151,7 +152,8 @@ public class ChatWindow
 							content = new Scanner(new File(userContainerPath
 									+ curFriend.getText())).useDelimiter("\\Z")
 									.next();
-						} catch (FileNotFoundException e)
+						}
+						catch (FileNotFoundException e)
 						{
 							Global.Log("Can't Open File of: "
 									+ curFriend.getText());
@@ -198,18 +200,21 @@ public class ChatWindow
 								{
 									writer = new PrintWriter(userContainerPath
 											+ newUser, "UTF-8");
-								} catch (FileNotFoundException
+								}
+								catch (FileNotFoundException
 										| UnsupportedEncodingException e2)
 								{
 									Global.Log("Unable to open the file that has been created");
 								}
 								writer.print("Messages Read From File:");
 								writer.close();
-							} else
+							}
+							else
 							{
 								Global.Log("File already exists.");
 							}
-						} catch (IOException e1)
+						}
+						catch (IOException e1)
 						{
 							Global.Log("File Cannot be created");
 						}
@@ -231,30 +236,35 @@ public class ChatWindow
 		{
 			public void actionPerformed(ActionEvent e)
 			{
+				if (!fileSize.getText().equals("0 Bytes"))
+				{
+					currentSendMessageBox.append("\n" + "File : " + filename.getText()
+							+ ", Size : " + fileSize.getText() + ".");
+				}
 				String curText = currentSendMessageBox.getText();
 				currentSendMessageBox.setText("");
 				if (curText.equals("") == false)
 				{
-					currentChatBox.append("\n" + curText);
-					//Global.Log(curFriend.getText());
-					curMessage = new Message(Global.myNick,curFriend.getText(),curText);
-					// curMessage.content = ;
-					// curMessage.destNick = ;
-
+					currentChatBox.append("\nYou : " + curText);
+					curMessage = new Message(Global.myNick,
+							curFriend.getText(), curText);
 					curFriendFile = new File(userContainerPath
 							+ curFriend.getText());
 					try
 					{
 						FileWriter fw = new FileWriter(curFriendFile, true);
 						BufferedWriter bw = new BufferedWriter(fw);
-						bw.write("\n" + curText);
+						bw.write("\nYou : " + curText);
 						bw.close();
 						Global.Log("Wrote: " + curText);
-					} catch (IOException e1)
+					}
+					catch (IOException e1)
 					{
 						Global.Log("Unable to write into File");
 					}
-					Global.Log("Contents of current Message: "+curMessage.sourceNick+"->"+curMessage.destNick+": "+curMessage.content);
+					Global.Log("Contents of current Message: "
+							+ curMessage.sourceNick + "->"
+							+ curMessage.destNick + ": " + curMessage.content);
 					synchronized (messageQueue)
 					{
 						messageQueue.addMessage(curMessage);
@@ -262,31 +272,17 @@ public class ChatWindow
 					}
 					Global.Log("reached Part After DeadLock");
 				}
-				if (!fileSize.getText().equals("0 Bytes"))
-				{
-					currentSendMessageBox.append("\n" + "File : "
-							+ filename.getText() + ", Size : "
-							+ fileSize.getText() + ".");
-				}
-				String msg;
+				
 				synchronized (currentSendMessageBox)
 				{
-					msg = currentSendMessageBox.getText();
 					currentSendMessageBox.notify();
-
 				}
-				if (msg.length() > 0)
-				{
-					currentChatBox.append("\n" + "You: ");
-					currentChatBox.append(msg);
-				}
-				/*
-				 * String filepath = filePath; String dest =
-				 * curFriend.getText(); JTextArea msgBox = currentChatBox;
-				 * JButton sendButton = fileTransfer; (new
-				 * FileSendControlThread(dest, filepath, msgBox, sendButton))
-				 * .start();
-				 */
+				String filepath = filePath;
+				String dest = curFriend.getText();
+				JTextArea msgBox = currentChatBox;
+				JButton sendButton = fileTransfer;
+				(new FileSendControlThread(dest, filepath, msgBox, sendButton))
+						.start();
 			}
 		});
 		frmChatServerV.getContentPane().add(btnSendMessage);
@@ -308,18 +304,22 @@ public class ChatWindow
 					{
 						float val = (size / 1000000);
 						fileSize.setText(val + "MB");
-					} else if (size > 1000)
+					}
+					else if (size > 1000)
 					{
 						float val = (size / 1000);
 						fileSize.setText(val + "KB");
-					} else if (size > 0)
+					}
+					else if (size > 0)
 					{
 						fileSize.setText(size + "B");
-					} else
+					}
+					else
 					{
 						fileSize.setText("Too large.");
 					}
-				} else
+				}
+				else
 				{
 					filename.setText("No file chosen.");
 					fileSize.setText("0 bytes");
@@ -354,7 +354,7 @@ public class ChatWindow
 
 		currentChatBox = new JTextArea();
 		currentChatBox.setEditable(false);
-		DefaultCaret caret = (DefaultCaret)currentChatBox.getCaret();
+		DefaultCaret caret = (DefaultCaret) currentChatBox.getCaret();
 		caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 		scrollPane_1.setViewportView(currentChatBox);
 		(new ChatReceiveThread(currentChatBox)).start();

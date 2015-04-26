@@ -73,7 +73,10 @@ public class RegisterRequestThread extends Thread
 			loginWindow.setVisible(false);
 			loginWindow.dispose();
 			Global.myNick = loginObj.nick;
-			ChatWindow chatWindow = new ChatWindow();
+			Global.window = new ChatWindow();
+			Global.window.frmChatServerV.setVisible(true);
+			Global.window.frmChatServerV.setResizable(false);
+			Global.window.frmChatServerV.setLocationRelativeTo(null);
 			return;
 		}
 		else

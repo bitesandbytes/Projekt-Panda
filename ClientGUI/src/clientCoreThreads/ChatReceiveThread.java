@@ -63,7 +63,7 @@ public class ChatReceiveThread extends Thread
 						FileWriter fw = new FileWriter(curFriendFile, true);
 						BufferedWriter bw = new BufferedWriter(fw);
 						Global.Log("Begin To Write");
-						bw.write("\n" + currentMessage.content);
+						bw.write("\n"+currentMessage.sourceNick + currentMessage.content);
 						bw.close();
 						Global.Log("Wrote: " + currentMessage.content);
 					} catch (IOException e1)
@@ -78,7 +78,7 @@ public class ChatReceiveThread extends Thread
 						 * writer.print(currentMessage.content); writer.close();
 						 */
 						Global.Log("Appending");
-						chatBox.append("\n"+currentMessage.content);
+						chatBox.append("\n"+currentMessage.sourceNick+currentMessage.content);
 					}
 				}
 			} catch (Exception ex)

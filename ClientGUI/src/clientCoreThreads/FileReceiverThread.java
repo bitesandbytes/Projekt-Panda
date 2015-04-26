@@ -82,8 +82,7 @@ public class FileReceiverThread extends Thread
 				.getInputStream());
 		Global.Log("Got OIS | NewFileReceiveThread.");
 		filename = (String) ois.readObject();
-		Global.Log("ReadUTF done | NewFileReceiveThread.");
-		Global.Log("Reading filename | NewFileReceiveThread.");
+		Global.Log("filename = "+filename+" | NewFileReceiveThread.");
 	}
 
 	private void readFromSocket(SocketChannel socketChannel, String filename)
