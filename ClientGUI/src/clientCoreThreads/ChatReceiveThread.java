@@ -88,7 +88,7 @@ public class ChatReceiveThread extends Thread
 				FileWriter fw = new FileWriter(curFriendFile, true);
 				BufferedWriter bw = new BufferedWriter(fw);
 				Global.Log("Begin To Write");
-				bw.write("\n" + currentMessage.sourceNick
+				bw.write("\n" + currentMessage.sourceNick + " : "
 						+ currentMessage.content);
 				bw.close();
 				Global.Log("Wrote: " + currentMessage.content);

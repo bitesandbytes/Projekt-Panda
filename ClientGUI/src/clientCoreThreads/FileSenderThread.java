@@ -12,6 +12,7 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.SocketChannel;
 
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 
 import coreClient.Global;
@@ -86,6 +87,8 @@ public class FileSenderThread extends Thread
 			Global.Log("File Successfully Sent | FileSenderThread.");
 			socketChannel.close();
 			aFile.close();
+			JOptionPane.showMessageDialog(Global.window.frmChatServerV,
+					"File : " + filename + " sent successfully. ");
 			Global.window.enableFileTransfer();
 			return;
 		}
