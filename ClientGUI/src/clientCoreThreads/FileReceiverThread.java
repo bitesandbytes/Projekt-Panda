@@ -9,6 +9,7 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 
+import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 
 import coreClient.Global;
@@ -28,7 +29,6 @@ public class FileReceiverThread extends Thread
 
 	public void run()
 	{
-		String filename = null;
 		ServerSocketChannel serverSocketChannel = null;
 		SocketChannel socketChannel = null;
 		Global.Log("Opening serverSocketChannel | NewReceiverThread");
@@ -67,11 +67,9 @@ public class FileReceiverThread extends Thread
 
 	private void writeSuccess()
 	{
-		synchronized (msgBox)
-		{
-			msgBox.append("\n" + filename + " transfer complete.");
-			msgBox.append("\nFile stored at " + destFolder);
-		}
+		JOptionPane.showMessageDialog(Global.window.frmChatServerV,
+				"File received : " + filename + "\nFull path: " + destFolder
+						+ filename);
 	}
 
 	private void getFilename(SocketChannel socketChannel) throws IOException,
@@ -82,7 +80,7 @@ public class FileReceiverThread extends Thread
 				.getInputStream());
 		Global.Log("Got OIS | NewFileReceiveThread.");
 		filename = (String) ois.readObject();
-		Global.Log("filename = "+filename+" | NewFileReceiveThread.");
+		Global.Log("filename = " + filename + " | NewFileReceiveThread.");
 	}
 
 	private void readFromSocket(SocketChannel socketChannel, String filename)

@@ -9,10 +9,10 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import javax.swing.JLabel;
 import javax.swing.JTextArea;
 
 import common.Message;
+
 import coreClient.Global;
 
 public class ChatReceiveThread extends Thread
@@ -29,7 +29,6 @@ public class ChatReceiveThread extends Thread
 	{
 		super();
 		this.chatBox = chatBox;
-
 	}
 
 	public void run()
@@ -38,7 +37,8 @@ public class ChatReceiveThread extends Thread
 		try
 		{
 			msgServer = new ServerSocket(msgRcvPort);
-		} catch (IOException e)
+		}
+		catch (IOException e)
 		{
 			Global.Log("FATAL ERROR : Unable to bind to local port @ "
 					+ msgRcvPort);
@@ -50,38 +50,9 @@ public class ChatReceiveThread extends Thread
 			try
 			{
 				currentMessage = getMessage(msgServer.accept());
-				if (currentMessage != null)
-				{
-					// Global.Log(currentMessage.sourceNick + ": "+
-					// currentMessage.content);
-					try
-					{
-						curFriendFile = new File(Global.userContainerPath
-								+ currentMessage.sourceNick);
-						Global.Log("Opened File: " + Global.userContainerPath
-								+ currentMessage.sourceNick);
-						FileWriter fw = new FileWriter(curFriendFile, true);
-						BufferedWriter bw = new BufferedWriter(fw);
-						Global.Log("Begin To Write");
-						bw.write("\n"+currentMessage.sourceNick + currentMessage.content);
-						bw.close();
-						Global.Log("Wrote: " + currentMessage.content);
-					} catch (IOException e1)
-					{
-						Global.Log("Unable to write into File");
-					}
-					if (Global.window.curFriend.getText().equals(currentMessage.sourceNick))
-					{
-						/*
-						 * writer = new PrintWriter(Global.userContainerPath +
-						 * currentMessage.sourceNick, "UTF-8");
-						 * writer.print(currentMessage.content); writer.close();
-						 */
-						Global.Log("Appending");
-						chatBox.append("\n"+currentMessage.sourceNick+currentMessage.content);
-					}
-				}
-			} catch (Exception ex)
+				writeMessage(currentMessage);
+			}
+			catch (Exception ex)
 			{
 				ex.printStackTrace();
 				Global.Log("Lost a message packet.");
@@ -104,4 +75,35 @@ public class ChatReceiveThread extends Thread
 
 	}
 
+	public void writeMessage(Message curMessage)
+	{
+		if (currentMessage != null)
+		{
+			try
+			{
+				curFriendFile = new File(Global.userContainerPath
+						+ currentMessage.sourceNick);
+				Global.Log("Opened File: " + Global.userContainerPath
+						+ currentMessage.sourceNick);
+				FileWriter fw = new FileWriter(curFriendFile, true);
+				BufferedWriter bw = new BufferedWriter(fw);
+				Global.Log("Begin To Write");
+				bw.write("\n" + currentMessage.sourceNick
+						+ currentMessage.content);
+				bw.close();
+				Global.Log("Wrote: " + currentMessage.content);
+			}
+			catch (IOException e1)
+			{
+				Global.Log("Unable to write into File");
+			}
+			if (Global.window.curFriend.getText().equals(
+					currentMessage.sourceNick))
+			{
+				Global.Log("Appending");
+				chatBox.append("\n" + currentMessage.sourceNick
+						+ currentMessage.content);
+			}
+		}
+	}
 }

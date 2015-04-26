@@ -1,7 +1,6 @@
 package coreClient;
 
-import javax.swing.JLabel;
-
+import clientCoreThreads.ChatReceiveThread;
 import GUI.ChatWindow;
 
 public class Global
@@ -18,6 +17,7 @@ public class Global
 	public static int pingTimeout = 1000;
 	public static String userContainerPath = "/home/sauce/Documents/";
 	public static ChatWindow window;
+	public static ChatReceiveThread chatReceiveThread;
 
 	public static void Log(Object o)
 	{

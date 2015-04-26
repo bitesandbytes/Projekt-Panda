@@ -236,11 +236,6 @@ public class ChatWindow
 		{
 			public void actionPerformed(ActionEvent e)
 			{
-				if (!fileSize.getText().equals("0 Bytes"))
-				{
-					currentSendMessageBox.append("\n" + "File : " + filename.getText()
-							+ ", Size : " + fileSize.getText() + ".");
-				}
 				String curText = currentSendMessageBox.getText();
 				currentSendMessageBox.setText("");
 				if (curText.equals("") == false)
@@ -272,7 +267,7 @@ public class ChatWindow
 					}
 					Global.Log("reached Part After DeadLock");
 				}
-				
+
 				synchronized (currentSendMessageBox)
 				{
 					currentSendMessageBox.notify();
@@ -357,7 +352,8 @@ public class ChatWindow
 		DefaultCaret caret = (DefaultCaret) currentChatBox.getCaret();
 		caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 		scrollPane_1.setViewportView(currentChatBox);
-		(new ChatReceiveThread(currentChatBox)).start();
+		Global.chatReceiveThread = new ChatReceiveThread(currentChatBox);
+		Global.chatReceiveThread.start();
 
 		filename = new JLabel("No file chosen.");
 		filename.setFont(new Font("Liberation Sans", Font.PLAIN, 13));

@@ -86,7 +86,7 @@ public class FileSenderThread extends Thread
 			Global.Log("File Successfully Sent | FileSenderThread.");
 			socketChannel.close();
 			aFile.close();
-			fileButton.setEnabled(true);
+			Global.window.enableFileTransfer();
 			return;
 		}
 		catch (FileNotFoundException e)
@@ -115,6 +115,6 @@ public class FileSenderThread extends Thread
 		{
 			msgBox.append("\n" + filename + " transfer failed. Try again.");
 		}
-		fileButton.setEnabled(true);
+		Global.window.enableFileTransfer();
 	}
 }
